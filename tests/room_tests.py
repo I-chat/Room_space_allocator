@@ -5,12 +5,14 @@ from app.person import Staff, Fellow
 
 class TestDojo(unittest.TestCase):
 
-    def clear_all_rooms():
+    def clear_all_rooms(self):
         Dojo.all_rooms = {}
+        Dojo.all_office = []
+        Dojo.all_ls = []
 
     def test_create_office(self):
+        self.clear_all_rooms()
         my_dojo = Dojo()
-        TestDojo.clear_all_rooms()
         initial_room_count = len(my_dojo.all_rooms)
         self.assertEqual(initial_room_count, 0)
         meeting_office = my_dojo.create_room('office', ['meeting'])
@@ -24,8 +26,8 @@ class TestDojo(unittest.TestCase):
         self.assertTrue('red' in my_dojo.all_rooms)
 
     def test_create_ls(self):
+        self.clear_all_rooms()
         my_dojo = Dojo()
-        TestDojo.clear_all_rooms()
         initial_room_count = len(my_dojo.all_rooms)
         self.assertEqual(initial_room_count, 0)
         blue_ls = my_dojo.create_room('living', ['blue'])
@@ -39,19 +41,27 @@ class TestDojo(unittest.TestCase):
         self.assertTrue('red' in my_dojo.all_rooms)
 
     def test_add_staff(self):
+        self.clear_all_rooms()
         my_dojo = Dojo()
-        ladi_office = my_dojo.create_room('office', ['blue'])
+        my_dojo.create_room('office', ['blue'])
+        ladi_office = my_dojo.all_office[0]
         self.assertFalse('ladi adeniran' in my_dojo.dojo_all_persons)
+        self.assertFalse('ladi adeniran' in ladi_office.room_all_persons)
         my_dojo.add_person('ladi', 'adeniran', 'staff')
         self.assertTrue('ladi adeniran' in my_dojo.dojo_all_persons)
-        self.assertTrue('ladi adeniran' in Room.room_all_persons)
+        self.assertTrue('ladi adeniran' in ladi_office.room_all_persons)
 
     def test_add_fellow(self):
+        self.clear_all_rooms()
         my_dojo = Dojo()
-        bj_office = my_dojo.create_room('office', ['red'])
-        bj_living = my_dojo.create_room('living', ['blue'])
+        my_dojo.create_room('office', ['red'])
+        my_dojo.create_room('living', ['blue'])
+        bj_living = my_dojo.all_ls[0]
+        bj_office = my_dojo.all_office[0]
         self.assertFalse('bolaji olajide' in my_dojo.dojo_all_persons)
-        self.assertFalse('bolaji olajide' in Room.room_all_persons)
-        my_dojo.add_person('bolaji', 'olajide', 'fellow')
+        self.assertFalse('bolaji olajide' in bj_office.room_all_persons)
+        self.assertFalse('bolaji olajide' in bj_living.room_all_persons)
+        my_dojo.add_person('bolaji', 'olajide', 'fellow', 'y')
         self.assertTrue('bolaji olajide' in my_dojo.dojo_all_persons)
-        self.assertTrue('bolaji olajide' in Room.room_all_persons)
+        self.assertTrue('bolaji olajide' in bj_living.room_all_persons)
+        self.assertTrue('bolaji olajide' in bj_office.room_all_persons)
