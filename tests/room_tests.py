@@ -31,9 +31,9 @@ class TestDojo(unittest.TestCase):
         new_room_count = len(my_dojo.all_rooms)
         self.assertEqual(new_room_count - initial_room_count, 1)
         same_meeting_office = my_dojo.create_room('office', ['meeting'])
-        self.assertEqual(same_meeting_office, 'Room already exist')
+        self.assertEqual(same_meeting_office, 'Room already exist\n')
         double_red_offices = my_dojo.create_room('office', ['red', 'red'])
-        self.assertEqual(double_red_offices, 'Room already exist')
+        self.assertEqual(double_red_offices, 'Room already exist\n')
         self.assertTrue('red' in my_dojo.all_rooms)
 
     def test_create_ls(self):
@@ -46,9 +46,9 @@ class TestDojo(unittest.TestCase):
         new_room_count = len(my_dojo.all_rooms)
         self.assertEqual(new_room_count - initial_room_count, 1)
         same_blue_ls = my_dojo.create_room('living', ['blue'])
-        self.assertEqual(same_blue_ls, 'Room already exist')
+        self.assertEqual(same_blue_ls, 'Room already exist\n')
         double_red_ls = my_dojo.create_room('living', ['red', 'red'])
-        self.assertEqual(double_red_ls, 'Room already exist')
+        self.assertEqual(double_red_ls, 'Room already exist\n')
         self.assertTrue('red' in my_dojo.all_rooms)
 
     def test_add_staff(self):
