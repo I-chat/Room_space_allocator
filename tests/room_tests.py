@@ -14,52 +14,55 @@ class TestDojo(unittest.TestCase):
         "---------------\nladi adeniran: fellow Living Space\n" \
         "bolaji olajide: fellow Living Space\n"
 
+# clears all data in lists and dictionary
     def clear_all_rooms(self):
-        Dojo.all_rooms = {}
+        Dojo.rooms_in_dojo = {}
         Dojo.all_office = []
-        Dojo.all_ls = []
-        Dojo.dojo_persons = {}
-        Dojo.unallocated = {}
+        Dojo.all_living_space = []
+        Dojo.persons_in_dojo = {}
+        Dojo.unallocated_persons = {}
 
     def test_create_office(self):
         TestDojo.clear_all_rooms(self)
         my_dojo = Dojo()
-        initial_room_count = len(my_dojo.all_rooms)
+        initial_room_count = len(my_dojo.rooms_in_dojo)
         self.assertEqual(initial_room_count, 0)
         meeting_office = my_dojo.create_room('office', ['meeting'])
-        self.assertTrue('meeting' in my_dojo.all_rooms)
-        new_room_count = len(my_dojo.all_rooms)
+        self.assertTrue('meeting' in my_dojo.rooms_in_dojo)
+        new_room_count = len(my_dojo.rooms_in_dojo)
         self.assertEqual(new_room_count - initial_room_count, 1)
         same_meeting_office = my_dojo.create_room('office', ['meeting'])
-        self.assertEqual(same_meeting_office, 'Room already exist\n')
+        self.assertEqual(same_meeting_office, 'Room already exist.\n')
         double_red_offices = my_dojo.create_room('office', ['red', 'red'])
-        self.assertEqual(double_red_offices, 'Room already exist\n')
-        self.assertTrue('red' in my_dojo.all_rooms)
+        self.assertEqual(
+            double_red_offices, 'An office called red has been created.\nRoom already exist.\n')
+        self.assertTrue('red' in my_dojo.rooms_in_dojo)
 
     def test_create_ls(self):
         TestDojo.clear_all_rooms(self)
         my_dojo = Dojo()
-        initial_room_count = len(my_dojo.all_rooms)
+        initial_room_count = len(my_dojo.rooms_in_dojo)
         self.assertEqual(initial_room_count, 0)
         blue_ls = my_dojo.create_room('living', ['blue'])
-        self.assertTrue('blue' in my_dojo.all_rooms)
-        new_room_count = len(my_dojo.all_rooms)
+        self.assertTrue('blue' in my_dojo.rooms_in_dojo)
+        new_room_count = len(my_dojo.rooms_in_dojo)
         self.assertEqual(new_room_count - initial_room_count, 1)
         same_blue_ls = my_dojo.create_room('living', ['blue'])
-        self.assertEqual(same_blue_ls, 'Room already exist\n')
+        self.assertEqual(same_blue_ls, 'Room already exist.\n')
         double_red_ls = my_dojo.create_room('living', ['red', 'red'])
-        self.assertEqual(double_red_ls, 'Room already exist\n')
-        self.assertTrue('red' in my_dojo.all_rooms)
+        self.assertEqual(
+            double_red_ls, 'A living space called red has been created.\nRoom already exist.\n')
+        self.assertTrue('red' in my_dojo.rooms_in_dojo)
 
     def test_add_staff(self):
         TestDojo.clear_all_rooms(self)
         my_dojo = Dojo()
         my_dojo.create_room('office', ['blue'])
         ladi_office = my_dojo.all_office[0]
-        self.assertFalse('ladi adeniran' in my_dojo.dojo_persons)
+        self.assertFalse('ladi adeniran' in my_dojo.persons_in_dojo)
         self.assertFalse('ladi adeniran' in ladi_office.room_persons)
         my_dojo.add_person('ladi', 'adeniran', 'staff')
-        self.assertTrue('ladi adeniran' in my_dojo.dojo_persons)
+        self.assertTrue('ladi adeniran' in my_dojo.persons_in_dojo)
         self.assertTrue('ladi adeniran' in ladi_office.room_persons)
         answer = my_dojo.add_person('bolaji', 'olajide', 'staff', 'y')
         self.assertEqual(
@@ -77,13 +80,13 @@ class TestDojo(unittest.TestCase):
         my_dojo = Dojo()
         my_dojo.create_room('office', ['red'])
         my_dojo.create_room('living', ['blue'])
-        bj_living = my_dojo.all_ls[0]
+        bj_living = my_dojo.all_living_space[0]
         bj_office = my_dojo.all_office[0]
-        self.assertFalse('bolaji olajide' in my_dojo.dojo_persons)
+        self.assertFalse('bolaji olajide' in my_dojo.persons_in_dojo)
         self.assertFalse('bolaji olajide' in bj_office.room_persons)
         self.assertFalse('bolaji olajide' in bj_living.room_persons)
         my_dojo.add_person('bolaji', 'olajide', 'fellow', 'y')
-        self.assertTrue('bolaji olajide' in my_dojo.dojo_persons)
+        self.assertTrue('bolaji olajide' in my_dojo.persons_in_dojo)
         self.assertTrue('bolaji olajide' in bj_living.room_persons)
         self.assertTrue('bolaji olajide' in bj_office.room_persons)
 
