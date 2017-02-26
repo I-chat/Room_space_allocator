@@ -59,37 +59,69 @@ class TestDojo(unittest.TestCase):
         TestDojo.clear_all_rooms(self)
         my_dojo = Dojo()
         my_dojo.create_room('office', ['blue'])
-        ladi_office = my_dojo.all_office[0]
-        self.assertFalse('ladi adeniran' in my_dojo.persons_in_dojo)
-        self.assertFalse('ladi adeniran' in ladi_office.room_persons)
+        my_dojo.create_room('living', ['red'])
+        office_one = my_dojo.all_office[0]
+        living_one = my_dojo.all_living_space[0]
+        initial_person_count = len(office_one.room_members)
+        self.assertEqual(initial_person_count, 0)
         my_dojo.add_person('ladi', 'adeniran', 'staff')
-        self.assertTrue('ladi adeniran' in my_dojo.persons_in_dojo)
-        self.assertTrue('ladi adeniran' in ladi_office.room_persons)
-        answer = my_dojo.add_person('bolaji', 'olajide', 'staff', 'y')
-        self.assertEqual(
-            answer, 'Sorry. Only fellows can have a living space.')
+        second_person_count = len(office_one.room_members)
+        self.assertEqual(second_person_count, 1)
+        my_dojo.add_person('bolaji', 'olajide', 'staff', 'y')
+        third_person_count = len(office_one.room_members)
+        persons_in_living_count = len(living_one.room_members)
+        self.assertEqual(third_person_count, 2)
+        self.assertEqual(persons_in_living_count, 0)
+
+    def test_add_more_than_six_person_in_office(self):
+        TestDojo.clear_all_rooms(self)
+        my_dojo = Dojo()
+        my_dojo.create_room('office', ['blue'])
+        office_one = my_dojo.all_office[0]
+        initial_person_count = len(office_one.room_members)
+        self.assertEqual(initial_person_count, 0)
+        my_dojo.add_person('ladi', 'adeniran', 'staff')
+        second_person_count = len(office_one.room_members)
+        self.assertEqual(second_person_count, 1)
+        my_dojo.add_person('bolaji', 'olajide', 'staff', 'y')
         my_dojo.add_person('oluwadamilola', 'durodola', 'staff')
         my_dojo.add_person('mumeen', 'olasode', 'staff')
         my_dojo.add_person('ichiato', 'ikikin', 'staff')
         my_dojo.add_person('falz', 'thabadguy', 'staff')
-        my_dojo.add_person('valentine', 'Mbonu', 'staff')
-        answer = my_dojo.add_person('adegboyega', 'koya', 'staff')
-        self.assertEqual(answer, 'No office is available.')
+        my_dojo.add_person('valentine', 'mbonu', 'staff')
+        third_person_count = len(office_one.room_members)
+        self.assertNotEqual(third_person_count, 7)
+        self.assertEqual(third_person_count, 6)
 
     def test_add_fellow(self):
         TestDojo.clear_all_rooms(self)
         my_dojo = Dojo()
-        my_dojo.create_room('office', ['red'])
         my_dojo.create_room('living', ['blue'])
-        bj_living = my_dojo.all_living_space[0]
-        bj_office = my_dojo.all_office[0]
-        self.assertFalse('bolaji olajide' in my_dojo.persons_in_dojo)
-        self.assertFalse('bolaji olajide' in bj_office.room_persons)
-        self.assertFalse('bolaji olajide' in bj_living.room_persons)
+        living_one = my_dojo.all_living_space[0]
+        initial_person_count = len(living_one.room_members)
+        self.assertEqual(initial_person_count, 0)
         my_dojo.add_person('bolaji', 'olajide', 'fellow', 'y')
-        self.assertTrue('bolaji olajide' in my_dojo.persons_in_dojo)
-        self.assertTrue('bolaji olajide' in bj_living.room_persons)
-        self.assertTrue('bolaji olajide' in bj_office.room_persons)
+        second_person_count = len(living_one.room_members)
+        self.assertEqual(second_person_count, 1)
+        my_dojo.add_person('ladi', 'adeniran', 'fellow', 'y')
+        third_person_count = len(living_one.room_members)
+        self.assertEqual(third_person_count, 2)
+
+    def test_test_add_more_than_four_person_in_living(self):
+        TestDojo.clear_all_rooms(self)
+        my_dojo = Dojo()
+        my_dojo.create_room('living', ['blue'])
+        living_one = my_dojo.all_living_space[0]
+        my_dojo.add_person('oluwadamilola', 'durodola', 'fellow', 'y')
+        my_dojo.add_person('bolaji', 'olajide', 'fellow', 'y')
+        my_dojo.add_person('mumeen', 'olasode', 'fellow', 'y')
+        my_dojo.add_person('ichiato', 'ikikin', 'fellow', 'y')
+        initial_person_count = len(living_one.room_members)
+        self.assertEqual(initial_person_count, 4)
+        my_dojo.add_person('falz', 'thabadguy', 'fellow', 'y')
+        second_person_count = len(living_one.room_members)
+        self.assertNotEqual(initial_person_count, 5)
+        self.assertEqual(initial_person_count, 4)
 
     def test_print_room(self):
         my_dojo = Dojo()
