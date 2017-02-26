@@ -11,15 +11,14 @@ class TestDojo(unittest.TestCase):
         "bolaji olajide\n"
 
     longStr2 = "UNALLOCATED LIST\n" + "---------------" \
-        "---------------\nladi adeniran: fellow Living Space\n" \
-        "bolaji olajide: fellow Living Space\n"
+        "---------------\nbolaji olajide: Living Space\n" \
+        "ladi adeniran: Living Space\n"
 
 # clears all data in lists and dictionary
     def clear_all_rooms(self):
         Dojo.rooms_in_dojo = {}
         Dojo.all_office = []
         Dojo.all_living_space = []
-        Dojo.persons_in_dojo = {}
         Dojo.unallocated_persons = {}
 
     def test_create_office(self):
@@ -34,8 +33,9 @@ class TestDojo(unittest.TestCase):
         same_meeting_office = my_dojo.create_room('office', ['meeting'])
         self.assertEqual(same_meeting_office, 'Room already exist.\n')
         double_red_offices = my_dojo.create_room('office', ['red', 'red'])
-        self.assertEqual(
-            double_red_offices, 'An office called red has been created.\nRoom already exist.\n')
+        self.assertEqual(double_red_offices,
+                         'An office called red has been created.'
+                         '\nRoom already exist.\n')
         self.assertTrue('red' in my_dojo.rooms_in_dojo)
 
     def test_create_ls(self):
@@ -46,12 +46,13 @@ class TestDojo(unittest.TestCase):
         my_dojo.create_room('living', ['blue'])
         self.assertTrue('blue' in my_dojo.rooms_in_dojo)
         new_room_count = len(my_dojo.rooms_in_dojo)
-        self.assertEqual(new_room_count - initial_room_count, 1)
+        self.assertEqual(new_room_count, 1)
         same_blue_ls = my_dojo.create_room('living', ['blue'])
         self.assertEqual(same_blue_ls, 'Room already exist.\n')
         double_red_ls = my_dojo.create_room('living', ['red', 'red'])
-        self.assertEqual(
-            double_red_ls, 'A living space called red has been created.\nRoom already exist.\n')
+        self.assertEqual(double_red_ls,
+                         'A living space called red has been created.'
+                         '\nRoom already exist.\n')
         self.assertTrue('red' in my_dojo.rooms_in_dojo)
 
     def test_add_staff(self):
