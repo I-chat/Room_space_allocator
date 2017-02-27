@@ -131,16 +131,17 @@ class TestDojo(unittest.TestCase):
         my_dojo.add_person('bolaji', 'olajide', 'staff', 'y')
         answer = my_dojo.print_room('red')
         self.assertEqual(
-            answer, 'There are no occupants in red at the moment.')
+            answer, 'bolaji olajide --> staff\n')
         answer = my_dojo.print_room('blue')
         self.assertEqual(
             answer, 'There are no occupants in blue at the moment.')
-        my_dojo.add_person('ladi', 'adeniran', 'fellow')
-        answer = my_dojo.print_room('red')
-        self.assertEqual(answer, 'ladi adeniran --> fellow')
+        my_dojo.add_person('ladi', 'adeniran', 'fellow', 'y')
+        output = my_dojo.print_room('red')
+        self.assertEqual(output, 'bolaji olajide --> staff\n'
+                         'ladi adeniran --> fellow\n')
         answer = my_dojo.print_room('blue')
         self.assertEqual(
-            answer, 'There are no occupants in blue at the moment.')
+            answer, 'ladi adeniran --> fellow\n')
 
     def test_print_allocations(self):
         my_dojo = Dojo()
@@ -161,7 +162,7 @@ class TestDojo(unittest.TestCase):
         my_file.close()
         self.assertEqual(content, self.longStr)
 
-    def test_file_print_unallocations(self):
+    def test_file_print_unallocated(self):
         my_dojo = Dojo()
         TestDojo.clear_all_rooms(self)
         my_dojo.create_room('office', ['red'])
