@@ -32,3 +32,19 @@ class Dojo(object):
                 output = output + ('Invalid command.\nFirst argument must be either'
                                    ' office or living.\n')
         return output
+
+    def get_available_room(self, room_type):
+        """ Gets any available office at random"""
+        available_room = []
+        if room_type == 'office':
+            for room in self.all_office:
+                if len(room.room_members) < 6:
+                    available_room.append(room)
+            if available_room:
+                return(random.choice(available_room))
+        else:
+            for room in self.all_living_space:
+                if len(room.room_members) < 4:
+                    available_room.append(room)
+            if available_room:
+                return(random.choice(available_room))
