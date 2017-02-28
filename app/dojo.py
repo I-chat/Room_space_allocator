@@ -33,6 +33,23 @@ class Dojo(object):
                                    ' office or living.\n')
         return output
 
+    def add_person_input_check(self, first_name, last_name, person_type, wants_accomodation='n'):
+        if wants_accomodation == 'y' or wants_accomodation == 'n':
+            if person_type == 'fellow':
+                if first_name.isalpha() and last_name.isalpha():
+                    self.add_fellow(first_name, last_name,
+                                    person_type, wants_accomodation)
+                else:
+                    return('First name and last name can only be alphabets.')
+            elif person_type == 'staff':
+                if first_name.isalpha() and last_name.isalpha():
+                    self.add_staff(first_name, last_name,
+                                   person_type, wants_accomodation)
+            else:
+                return('A person can only be a fellow or a staff.')
+        else:
+            print("wants_accomodation can only be 'Y' or 'N'.")
+
     def get_available_room(self, room_type):
         """ Gets any available office at random"""
         available_room = []
