@@ -30,5 +30,6 @@ Room_space_allocator is a python3 program that allocates room based on different
 ### To run nose test
 * cd into the project root directory
 * run `nosetests`
+
 ### To use the functionalities
 * cd into the app directory in the project folder and run `python main.py`
