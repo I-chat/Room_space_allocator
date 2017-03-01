@@ -1,10 +1,13 @@
+import operator
+import random
+
 from app.person import Fellow, Person, Staff
 from app.room import LivingSpace, Office, Room
 
 
 class Dojo(object):
     rooms_in_dojo = {}
-    persons_in_dojo = {}
+    all_persons_in_dojo = {}
     all_office = []
     all_living_space = []
     unallocated_persons = {}
@@ -154,3 +157,23 @@ class Dojo(object):
             self.unallocated_persons[
                 new_person.unique_id] = [new_person.full_name, 'Office']
             return('No office is available.')
+
+    def print_room(self, room_name):
+        """ Gets any given room if created and
+         prints out the occupants if any."""
+        combine_rooms = self.all_living_space + self.all_office
+        if any(x.room_name == room_name for x in combine_rooms):
+            for room in combine_rooms:
+                if room.room_name == room_name:
+                    if not any(room.room_members):
+                        return('There are no occupants in ' +
+                               room.room_name + ' at the moment.')
+                    else:
+                        output = ''
+                        for key in sorted(room.room_members.values(),
+                                          key=operator.attrgetter('full_name')):
+                            output += key.full_name + ' --> ' \
+                                + key.person_type + '\n'
+                        return (output)
+        else:
+            return('No room named', room_name, 'at the moment.')
