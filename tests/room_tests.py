@@ -166,7 +166,7 @@ class TestDojo(unittest.TestCase):
         content = self.my_dojo.print_unallocated()
         self.assertEqual(content, self.longStr2)
 
-    def test_reallocate_person_to_ls(self):
+    def test_reallocate_person_to_office(self):
         self.my_dojo.create_room('office', ['red'])
         initial_red_room_count = len(self.my_dojo.all_office[0].room_members)
         self.assertEqual(initial_red_room_count, 0)
@@ -183,5 +183,39 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(second_green_room_count, 1)
         self.assertEqual(third_red_room_count, 0)
 
-    def test_reallocate_person_to_office(self):
-        self.my_dojo.create_room('office', )
+    def test_reallocate_person_to_ls(self):
+        self.my_dojo.create_room('living', ['red'])
+        initial_red_room_count = len(
+            self.my_dojo.all_living_space[0].room_members)
+        self.assertEqual(initial_red_room_count, 0)
+        self.my_dojo.add_person_input_check('ladi', 'adeniran', 'fellow', 'y')
+        second_red_room_count = len(
+            self.my_dojo.all_living_space[0].room_members)
+        self.assertEqual(second_red_room_count, 1)
+        person_id = list(Dojo.all_persons_in_dojo)[0]
+        self.my_dojo.create_room('living', ['green'])
+        initial_green_room_count = len(
+            self.my_dojo.all_living_space[1].room_members)
+        self.assertEqual(initial_green_room_count, 0)
+        self.my_dojo.reallocate_person(person_id, 'green')
+        second_green_room_count = len(
+            self.my_dojo.all_living_space[1].room_members)
+        third_red_room_count = len(
+            self.my_dojo.all_living_space[0].room_members)
+        self.assertEqual(second_green_room_count, 1)
+        self.assertEqual(third_red_room_count, 0)
+
+    def test_load_people(self):
+        self.my_dojo.create_room('living', ['red'])
+        self.my_dojo.create_room('office', ['blue'])
+        initial_red_room_count = len(
+            self.my_dojo.all_living_space[0].room_members)
+        initial_blue_room_count = len(self.my_dojo.all_office[0].room_members)
+        self.assertEqual(initial_blue_room_count, 0)
+        self.assertEqual(initial_red_room_count, 0)
+        self.my_dojo.load_people('load')
+        second_red_room_count = len(
+            self.my_dojo.all_living_space[0].room_members)
+        second_blue_room_count = len(self.my_dojo.all_office[0].room_members)
+        self.assertEqual(second_red_room_count, 4)
+        self.assertEqual(second_blue_room_count, 6)
