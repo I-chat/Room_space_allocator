@@ -177,3 +177,36 @@ class Dojo(object):
                         return (output)
         else:
             return('No room named', room_name, 'at the moment.')
+
+    def print_allocations(self, filename=''):
+        """ Gets a list """
+        if '.txt' in filename:
+            path = 'data/' + filename
+        else:
+            path = 'data/' + filename + '.txt'
+        combine_rooms = self.all_living_space + self.all_office
+        if filename:
+            print('logging all allocated persons to ' + filename + '...')
+            my_file = open(path, 'w')
+            for room in combine_rooms:
+                if len(room.room_members) > 0:
+                    output = room.room_name.upper() + '\n'
+                    output = output + ('-' * 30) + '\n'
+                    output = output + \
+                        (', '.join(
+                            [obj.full_name for obj in room.room_members.values()]) + '\n')
+                    my_file.write(output)
+                    my_file.close()
+                else:
+                    return('There are no occupants in any room.')
+        else:
+            for room in combine_rooms:
+                if len(room.room_members) > 0:
+                    output = room.room_name.upper() + '\n'
+                    output = output + ('-' * 30) + '\n'
+                    output = output + \
+                        (', '.join(
+                            [obj.full_name for obj in room.room_members.values()]) + '\n')
+                    return(output)
+                else:
+                    return('There are no occupants in any room.')
