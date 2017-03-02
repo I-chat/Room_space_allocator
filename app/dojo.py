@@ -224,3 +224,35 @@ class Dojo(object):
                     return(output)
                 else:
                     return('There are no occupants in any room.')
+
+    @classmethod
+    def print_unallocated(cls, filename=''):
+        """ Gets a list """
+        if '.txt' in filename:
+            path = 'data/' + filename
+        else:
+            path = 'data/' + filename + '.txt'
+        if filename:
+            head = 'UNALLOCATED LIST\n'
+            head = head + ('-' * 30) + '\n'
+            if len(cls.unallocated_persons) > 0:
+                print('logging all allocated persons to ' + path + '...')
+                my_file = open(path, 'w')
+                my_file.write(head)
+                for value in sorted(cls.unallocated_persons.values()):
+                    my_file.write(('{v1}: {v2}\n'.format(
+                        v1=value[0], v2=value[1])))
+                my_file.close()
+            else:
+                return('There are no unallocated persons.')
+        else:
+            head = 'UNALLOCATED LIST\n'
+            head = head + ('-' * 30) + '\n'
+            if len(cls.unallocated_persons) > 0:
+                output = ''
+                for value in sorted(cls.unallocated_persons.values()):
+                    output = output + ('{v1}: {v2}\n'.format(
+                        v1=value[0], v2=value[1]))
+                return(head + output)
+            else:
+                return('There are no unallocated persons.')
