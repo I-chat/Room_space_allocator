@@ -63,6 +63,18 @@ class Dojo(object):
             if available_room:
                 return(random.choice(available_room))
 
+    def id_generator(self, person_type):
+        if person_type == 'staff':
+            staff_id = 'DJ-S-' + str(random.randint(0x1000, 0x270F))
+            while staff_id in self.all_persons_in_dojo:
+                staff_id = 'DJ-S-' + str(random.randint(0x1000, 0x270F))
+            return(staff_id)
+        else:
+            fellow_id = 'DJ-F-' + str(random.randint(0x1000, 0x270F))
+            while fellow_id in self.all_persons_in_dojo:
+                fellow_id = 'DJ-F-' + str(random.randint(0x1000, 0x270F))
+            return(fellow_id)
+
     def add_fellow(self, first_name, last_name,
                    person_type, wants_accomodation='n'):
         new_person = Fellow(first_name, last_name)
