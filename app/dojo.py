@@ -14,26 +14,20 @@ class Dojo(object):
 
     def create_room(self, room_type, room_name):
         output = ""
-        for room in room_name:
-            if room in Dojo.rooms_in_dojo:
+        for name in room_name:
+            combine_rooms = self.all_office + self.all_living_space
+            if name in [room.room_name for room in combine_rooms]:
                 output = output + ('Room already exist.\n')
-            elif not room.isalnum():
-                output = output + ('Invalid room naming convention!\n')
             elif room_type == 'office':
-                new_room = Office(room)
+                new_room = Office(name)
                 self.all_office.append(new_room)
-                self.rooms_in_dojo[new_room.room_name] = new_room.room_type
                 output = output + \
-                    ('An office called %s has been created.\n' % room)
+                    ('An office called %s has been created.\n' % name)
             elif room_type == 'living':
-                new_room = LivingSpace(room)
+                new_room = LivingSpace(name)
                 self.all_living_space.append(new_room)
-                self.rooms_in_dojo[new_room.room_name] = new_room.room_type
                 output = output + \
-                    ('A living space called %s has been created.\n' % room)
-            elif room_type != 'living' and room_type != 'office':
-                output = output + ('Invalid command.\nFirst argument must be either'
-                                   ' office or living.\n')
+                    ('A living space called %s has been created.\n' % name)
         return output
 
     def add_person_input_check(self, first_name, last_name, person_type, wants_accomodation='n'):
@@ -51,7 +45,7 @@ class Dojo(object):
             else:
                 return('A person can only be a fellow or a staff.')
         else:
-            print("wants_accomodation can only be 'Y' or 'N'.")
+            return("wants_accomodation can only be 'Y' or 'N'.")
 
     def get_available_room(self, room_type):
         """ Gets any available office at random"""
@@ -71,91 +65,90 @@ class Dojo(object):
 
     def add_fellow(self, first_name, last_name,
                    person_type, wants_accomodation='n'):
-        full_name = first_name + ' ' + last_name
         new_person = Fellow(first_name, last_name)
+        unique_id = self.id_generator(person_type)
         if wants_accomodation == 'y':
             person_living = self.get_available_room('living')
             person_office = self.get_available_room('office')
             if person_living and person_office:
-                self.all_persons_in_dojo[new_person.unique_id] = new_person
-                person_living.room_members[
-                    new_person.unique_id] = new_person
-                person_office.room_members[
-                    new_person.unique_id] = new_person
+                self.all_persons_in_dojo[unique_id] = new_person
+                person_living.room_members[unique_id] = new_person
+                person_office.room_members[unique_id] = new_person
                 new_person.assigned_room[
-                    'living'] = person_living
+                    'my_living'] = person_living
                 new_person.assigned_room[
-                    'office'] = person_office
+                    'my_office'] = person_office
                 return(new_person.full_name + ' with I.D number '
-                       + new_person.unique_id + ' has been allocated the '
+                       + unique_id + ' has been allocated the '
                        + person_living.room_type + ' ' + person_living.room_name)
             elif person_office is None and person_living is None:
-                self.unallocated_persons[new_person.unique_id] = [
+                self.unallocated_persons[unique_id] = [
                     new_person.full_name, 'Living Space']
-                self.unallocated_persons[new_person.unique_id] = [
+                self.unallocated_persons[unique_id] = [
                     new_person.full_name, 'Office']
                 return('No office and living room available.')
             elif person_office:
-                self.all_persons_in_dojo[new_person.unique_id] = new_person
+                self.all_persons_in_dojo[unique_id] = new_person
                 person_office.room_members[
-                    new_person.unique_id] = new_person
+                    unique_id] = new_person
                 new_person.assigned_room[
-                    'office'] = person_office
-                self.unallocated_persons[new_person.unique_id] = [
+                    'my_office'] = person_office
+                self.unallocated_persons[unique_id] = [
                     new_person.full_name, 'Living Space']
                 return(new_person.full_name + ' with I.D number '
-                       + new_person.unique_id + ' has been allocated the '
+                       + unique_id + ' has been allocated the '
                        + person_office.room_type + ' ' + person_office.room_name
                        + '\n Only an Office was allocated. No available Living Space.')
             else:
-                self.all_persons_in_dojo[new_person.unique_id] = new_person
+                self.all_persons_in_dojo[unique_id] = new_person
                 person_living.room_members[
-                    new_person.unique_id] = new_person
+                    unique_id] = new_person
                 new_person.assigned_room[
-                    'living'] = person_living
-                self.unallocated_persons[new_person.unique_id] = [
+                    'my_living'] = person_living
+                self.unallocated_persons[unique_id] = [
                     new_person.full_name, 'Office']
                 return(new_person.full_name + ' with I.D number '
-                       + new_person.unique_id + ' has been allocated the '
+                       + unique_id + ' has been allocated the '
                        + person_living.room_type + ' ' + person_living.room_name
                        + '\n Only a Living Space was allocated. No available Office.')
         else:
             person_office = self.get_available_room('office')
             if person_office:
-                self.all_persons_in_dojo[new_person.unique_id] = new_person
+                self.all_persons_in_dojo[unique_id] = new_person
                 person_office.room_members[
-                    new_person.unique_id] = new_person
+                    unique_id] = new_person
                 new_person.assigned_room[
-                    'office'] = person_office
+                    'my_office'] = person_office
                 return(new_person.full_name + ' with I.D number '
-                       + new_person.unique_id + ' has been allocated the '
+                       + unique_id + ' has been allocated the '
                        + person_office.room_type + ' ' + person_office.room_name)
             else:
                 self.unallocated_persons[
-                    new_person.unique_id] = [new_person.full_name, 'Office']
+                    unique_id] = [new_person.full_name, 'Office']
                 return('No Office available.')
 
     def add_staff(self, first_name, last_name, person_type, wants_accomodation='n'):
         new_person = Staff(first_name, last_name)
+        unique_id = self.id_generator(person_type)
         person_office = self.get_available_room('office')
         if wants_accomodation == 'y' and person_office:
-            self.all_persons_in_dojo[new_person.unique_id] = new_person
-            person_office.room_members[new_person.unique_id] = new_person
+            self.all_persons_in_dojo[unique_id] = new_person
+            person_office.room_members[unique_id] = new_person
             output = '\nSorry. Only fellows can have a living space.'
             return(new_person.full_name + ' with I.D number '
-                   + new_person.unique_id + ' has been allocated the '
+                   + unique_id + ' has been allocated the '
                    + person_office.room_type + ' '
                    + person_office.room_name + output)
         elif person_office:
-            self.all_persons_in_dojo[new_person.unique_id] = new_person
-            person_office.room_members[new_person.unique_id] = new_person
-            new_person.assigned_room['office'] = person_office
+            self.all_persons_in_dojo[unique_id] = new_person
+            person_office.room_members[unique_id] = new_person
+            new_person.assigned_room['my_office'] = person_office
             return(new_person.full_name + ' with I.D number '
-                   + new_person.unique_id + ' has been allocated the '
+                   + unique_id + ' has been allocated the '
                    + person_office.room_type + ' ' + person_office.room_name)
         else:
             self.unallocated_persons[
-                new_person.unique_id] = [new_person.full_name, 'Office']
+                unique_id] = [new_person.full_name, 'Office']
             return('No office is available.')
 
     def print_room(self, room_name):

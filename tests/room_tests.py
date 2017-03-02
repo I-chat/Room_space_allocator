@@ -14,45 +14,52 @@ class TestDojo(unittest.TestCase):
         "---------------\nbolaji olajide: Living Space\n" \
         "ladi adeniran: Living Space\n"
 
+    longStr3 = "OLUWAFEMI SULE fellow y\nDOMINIC WALTERS staff\nSIMON" \
+        " PATTERSON fellow y\nMARI LAWRENCE fellow y\nLEIGH RILEY staff\n" \
+        "TANA LOPEZ fellow y\nKELLY McGUIRE staff"
+
     def setUp(self):
         self.my_dojo = Dojo()
 
     def tearDown(self):
-        Dojo.rooms_in_dojo = {}
         Dojo.all_office = []
         Dojo.all_living_space = []
         Dojo.all_persons_in_dojo = {}
         Dojo.unallocated_persons = {}
 
     def test_create_office(self):
-        initial_room_count = len(self.my_dojo.rooms_in_dojo)
+        initial_room_count = len(self.my_dojo.all_office)
         self.assertEqual(initial_room_count, 0)
         self.my_dojo.create_room('office', ['meeting'])
-        self.assertTrue('meeting' in self.my_dojo.rooms_in_dojo)
-        new_room_count = len(self.my_dojo.rooms_in_dojo)
-        self.assertEqual(new_room_count - initial_room_count, 1)
+        second_room_count = len(self.my_dojo.all_office)
+        self.assertEqual(second_room_count, 1)
         same_meeting_office = self.my_dojo.create_room('office', ['meeting'])
+        third_room_count = len(self.my_dojo.all_office)
         self.assertEqual(same_meeting_office, 'Room already exist.\n')
+        self.assertEqual(third_room_count, 1)
         double_red_offices = self.my_dojo.create_room('office', ['red', 'red'])
+        fourth_room_count = len(self.my_dojo.all_office)
         self.assertEqual(double_red_offices,
                          'An office called red has been created.'
                          '\nRoom already exist.\n')
-        self.assertTrue('red' in self.my_dojo.rooms_in_dojo)
+        self.assertEqual(fourth_room_count, 2)
 
     def test_create_ls(self):
-        initial_room_count = len(self.my_dojo.rooms_in_dojo)
+        initial_room_count = len(self.my_dojo.all_living_space)
         self.assertEqual(initial_room_count, 0)
         self.my_dojo.create_room('living', ['blue'])
-        self.assertTrue('blue' in self.my_dojo.rooms_in_dojo)
-        new_room_count = len(self.my_dojo.rooms_in_dojo)
-        self.assertEqual(new_room_count, 1)
+        second_room_count = len(self.my_dojo.all_living_space)
+        self.assertEqual(second_room_count, 1)
         same_blue_ls = self.my_dojo.create_room('living', ['blue'])
+        third_room_count = len(self.my_dojo.all_living_space)
         self.assertEqual(same_blue_ls, 'Room already exist.\n')
+        self.assertEqual(third_room_count, 1)
         double_red_ls = self.my_dojo.create_room('living', ['red', 'red'])
+        fourth_room_count = len(self.my_dojo.all_living_space)
         self.assertEqual(double_red_ls,
                          'A living space called red has been created.'
                          '\nRoom already exist.\n')
-        self.assertTrue('red' in self.my_dojo.rooms_in_dojo)
+        self.assertEqual(fourth_room_count, 2)
 
     def test_add_staff(self):
         self.my_dojo.create_room('office', ['blue'])
@@ -173,7 +180,7 @@ class TestDojo(unittest.TestCase):
         self.my_dojo.add_person_input_check('ladi', 'adeniran', 'staff')
         second_red_room_count = len(self.my_dojo.all_office[0].room_members)
         self.assertEqual(second_red_room_count, 1)
-        person_id = list(Dojo.all_persons_in_dojo)[0]
+        person_id = list(Dojo.all_persons_in_dojo.keys())[0]
         self.my_dojo.create_room('office', ['green'])
         initial_green_room_count = len(self.my_dojo.all_office[1].room_members)
         self.assertEqual(initial_green_room_count, 0)
@@ -213,9 +220,14 @@ class TestDojo(unittest.TestCase):
         initial_blue_room_count = len(self.my_dojo.all_office[0].room_members)
         self.assertEqual(initial_blue_room_count, 0)
         self.assertEqual(initial_red_room_count, 0)
+        my_file = open('data/load.txt', 'w')
+        my_file.write(self.longStr3)
+        my_file.close()
         self.my_dojo.load_people('load')
         second_red_room_count = len(
             self.my_dojo.all_living_space[0].room_members)
         second_blue_room_count = len(self.my_dojo.all_office[0].room_members)
-        self.assertEqual(second_red_room_count, 4)
         self.assertEqual(second_blue_room_count, 6)
+        self.assertEqual(second_red_room_count, 4)
+
+    # def test_save_state()
