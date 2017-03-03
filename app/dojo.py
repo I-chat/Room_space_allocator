@@ -4,6 +4,8 @@ import random
 
 from app.person import Fellow, Person, Staff
 from app.room import LivingSpace, Office, Room
+from database.database import *
+from sqlalchemy.sql import select
 
 
 class Dojo(object):
@@ -314,7 +316,7 @@ class Dojo(object):
         else:
             return('Invalid identification number')
 
-        @classmethod
+    @classmethod
     def load_people(cls, filename):
         if '.txt' in filename:
             path = 'data/' + filename
@@ -334,3 +336,32 @@ class Dojo(object):
                     return("Incorrect length of parameters.")
         else:
             return("No file named ", filename, " in the data folder.")
+
+    @classmethod
+    def save_state(cls, database_name='db'):
+        path = 'database/' + database_name + '.sqlite3'
+        database = DbConnector(path)
+
+        database_session = database.Session
+
+        combine_rooms = cls.all_office + cls.all_living_space
+
+        for room in combine_rooms:
+            new_person = RoomData(name=room.room_name,
+                                  room_type=room.room_type, members=room.room_members)
+            database_session.add(new_person)
+            database_session.commit()
+
+        for key, value in cls.all_persons_in_dojo.items():
+            new_person = PersonData(person_id=key, firstname=value.full_name, lastname=value.last_name,
+                                    fullname=value.full_name, person_type=value.person_type, assigned_room=value.assigned_room)
+            database_session.add(new_person)
+            database_session.commit()
+
+        person_dict = DojoData(person_obj=cls.all_persons_in_dojo)
+        database_session.add(person_dict)
+        database_session.commit()
+
+        unallocated = UnallocatedData(person_obj=cls.unallocated_persons)
+        database_session.add(unallocated)
+        database_session.commit()
