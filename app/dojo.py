@@ -256,3 +256,61 @@ class Dojo(object):
                 return(head + output)
             else:
                 return('There are no unallocated persons.')
+
+    @classmethod
+    def reallocate_person(cls, person_id, room_name):
+        office_obj = [
+            room for room in cls.all_office if room.room_name == room_name]
+        if office_obj:
+            if len(office_obj[0].room_members) == 6:
+                return('Room is already filled to capacity.')
+            elif person_id in office_obj[0].room_members:
+                return (person_id, 'is already a member of room', room_name)
+            else:
+                cls.reallocate_person_to_office(
+                    person_id, room_name, office_obj[0])
+        elif not office_obj:
+            living_obj = [
+                room for room in cls.all_living_space if room.room_name == room_name]
+            if living_obj:
+                if len(living_obj[0].room_members) == 4:
+                    return('Room is already filled to capacity.')
+                elif person_id in living_obj[0].room_members:
+                    return(person_id, 'is already a member of room', room_name)
+                else:
+                    cls.reallocate_person_to_ls(
+                        person_id, room_name, living_obj[0])
+        else:
+            return(room_name, 'does not exist.')
+
+    @classmethod
+    def reallocate_person_to_office(cls, person_id, room_name, room_obj):
+        if person_id in cls.all_persons_in_dojo:
+            if 'my_office' in cls.all_persons_in_dojo[person_id].assigned_room:
+                del cls.all_persons_in_dojo[person_id].assigned_room[
+                    'my_office'].room_members[person_id]
+                room_obj.room_members[
+                    person_id] = cls.all_persons_in_dojo[person_id]
+                cls.all_persons_in_dojo[person_id].assigned_room[
+                    'my_office'] = room_obj
+                return(person_id, 'has been successfully reallocated.')
+            else:
+                return(person_id, 'is yet to be allocated an office.')
+        else:
+            return('Invalid identification number')
+
+    @classmethod
+    def reallocate_person_to_ls(cls, person_id, room_name, room_obj):
+        if person_id in cls.all_persons_in_dojo:
+            if 'my_living' in cls.all_persons_in_dojo[person_id].assigned_room:
+                del cls.all_persons_in_dojo[person_id].assigned_room[
+                    'my_living'].room_members[person_id]
+                room_obj.room_members[
+                    person_id] = cls.all_persons_in_dojo[person_id]
+                cls.all_persons_in_dojo[person_id].assigned_room[
+                    'my_living'] = room_obj
+                return(person_id, 'has been successfully reallocated.')
+            else:
+                return(person_id, 'is yet to be allocated a living space.')
+        else:
+            return('Invalid identification number')
