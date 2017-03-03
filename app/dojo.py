@@ -1,7 +1,6 @@
 import operator
 import os.path
 import random
-from pathlib import Path
 
 from app.person import Fellow, Person, Staff
 from app.room import LivingSpace, Office, Room
@@ -314,3 +313,24 @@ class Dojo(object):
                 return(person_id, 'is yet to be allocated a living space.')
         else:
             return('Invalid identification number')
+
+        @classmethod
+    def load_people(cls, filename):
+        if '.txt' in filename:
+            path = 'data/' + filename
+        else:
+            path = 'data/' + filename + '.txt'
+
+        if os.path.isfile(path):
+            my_file = open(path)
+            for line in my_file:
+                arg = line.split()
+                if len(arg) == 4:
+                    cls.add_person_input_check(arg[0], arg[1], arg[2], arg[3])
+                elif len(arg) == 3:
+                    cls.add_person_input_check(arg[0], arg[1], arg[2],
+                                               wants_accomodation='n')
+                else:
+                    return("Incorrect length of parameters.")
+        else:
+            return("No file named ", filename, " in the data folder.")
