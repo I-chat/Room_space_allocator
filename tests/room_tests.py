@@ -227,4 +227,11 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(second_blue_room_count, 6)
         self.assertEqual(second_red_room_count, 4)
 
-    # def test_save_state()
+    def test_save_state(self):
+        Dojo.create_room('living', ['red', 'green'])
+        Dojo.create_room('office', ['blue'])
+        Dojo.add_person_input_check('mumeen', 'olasode', 'staff')
+        Dojo.add_person_input_check('ichiato', 'ikikin', 'staff')
+        Dojo.add_person_input_check('bolaji', 'olajide', 'fellow', 'y')
+        Dojo.add_person_input_check('ladi', 'adeniran', 'fellow', 'y')
+        Dojo.save_state()
