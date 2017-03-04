@@ -1,11 +1,11 @@
 import unittest
 
 from app.dojo import Dojo
-from app.person import Fellow, Staff
-from app.room import Room
 
 
 class TestDojo(unittest.TestCase):
+    """Test all functionalities of Dojo class."""
+
     longStr = "RED\n" + "------------" \
         "------------------\n" \
         "bolaji olajide\n"
@@ -19,12 +19,14 @@ class TestDojo(unittest.TestCase):
         "TANA LOPEZ fellow y\nKELLY McGUIRE staff"
 
     def tearDown(self):
+        """Empty all data structures in Dojo after each test case."""
         Dojo.all_office = []
         Dojo.all_living_space = []
         Dojo.all_persons_in_dojo = {}
         Dojo.unallocated_persons = {}
 
     def test_create_office(self):
+        """Test the creation of offices functionality in Dojo."""
         initial_room_count = len(Dojo.all_office)
         self.assertEqual(initial_room_count, 0)
         Dojo.create_room('office', ['meeting'])
@@ -42,6 +44,7 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(fourth_room_count, 2)
 
     def test_create_ls(self):
+        """Test the creation of living space functionality in Dojo."""
         initial_room_count = len(Dojo.all_living_space)
         self.assertEqual(initial_room_count, 0)
         Dojo.create_room('living', ['blue'])
@@ -59,6 +62,7 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(fourth_room_count, 2)
 
     def test_add_staff(self):
+        """Test the allocation of staff to offices only."""
         Dojo.create_room('office', ['blue'])
         Dojo.create_room('living', ['red'])
         office_one = Dojo.all_office[0]
@@ -75,6 +79,7 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(persons_in_living_count, 0)
 
     def test_add_more_than_six_person_in_office(self):
+        """Test that not more than 6 persons can be assigned an office."""
         Dojo.create_room('office', ['blue'])
         office_one = Dojo.all_office[0]
         initial_person_count = len(office_one.room_members)
@@ -94,6 +99,7 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(third_person_count, 6)
 
     def test_add_fellow(self):
+        """Test the allocation of fellows to a living space."""
         Dojo.create_room('living', ['blue'])
         living_one = Dojo.all_living_space[0]
         initial_person_count = len(living_one.room_members)
@@ -106,6 +112,7 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(third_person_count, 2)
 
     def test_test_add_more_than_four_person_in_living(self):
+        """Test that not more than 4 persons can be assigned a living space."""
         Dojo.create_room('living', ['blue'])
         living_one = Dojo.all_living_space[0]
         Dojo.add_person_input_check(
@@ -117,10 +124,10 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(initial_person_count, 4)
         Dojo.add_person_input_check('falz', 'thabadguy', 'fellow', 'y')
         second_person_count = len(living_one.room_members)
-        self.assertNotEqual(initial_person_count, 5)
-        self.assertEqual(initial_person_count, 4)
+        self.assertEqual(second_person_count, 4)
 
     def test_print_room(self):
+        """Test the printing of the occupants in a given room if any."""
         Dojo.create_room('office', ['red'])
         Dojo.create_room('living', ['blue'])
         Dojo.add_person_input_check('bolaji', 'olajide', 'staff', 'y')
@@ -139,12 +146,14 @@ class TestDojo(unittest.TestCase):
             answer, 'ladi adeniran --> fellow\n')
 
     def test_print_allocations(self):
+        """Test the printing of all persons who were allocated a room."""
         Dojo.create_room('office', ['red'])
         Dojo.add_person_input_check('bolaji', 'olajide', 'fellow')
         content = Dojo.print_allocations()
         self.assertEqual(content, self.longStr)
 
     def test_file_print_allocations(self):
+        """Test the writing to file of persons who were allocated a room."""
         Dojo.create_room('office', ['red'])
         Dojo.add_person_input_check('bolaji', 'olajide', 'fellow', 'y')
         Dojo.print_allocations('output')
@@ -154,6 +163,7 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(content, self.longStr)
 
     def test_file_print_unallocated(self):
+        """Test the writing to file of persons who are yet to get a room."""
         Dojo.create_room('office', ['red'])
         Dojo.add_person_input_check('bolaji', 'olajide', 'fellow', 'y')
         Dojo.add_person_input_check('ladi', 'adeniran', 'fellow', 'y')
@@ -164,6 +174,7 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(content, self.longStr2)
 
     def test_print_unallocated(self):
+        """Test the printing of all persons who are yet to be given a room."""
         Dojo.create_room('office', ['red'])
         Dojo.add_person_input_check('bolaji', 'olajide', 'fellow', 'y')
         Dojo.add_person_input_check('ladi', 'adeniran', 'fellow', 'y')
@@ -171,6 +182,7 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(content, self.longStr2)
 
     def test_reallocate_person_to_office(self):
+        """Test the reallocation of a person from an office to another."""
         Dojo.create_room('office', ['red'])
         initial_red_room_count = len(Dojo.all_office[0].room_members)
         self.assertEqual(initial_red_room_count, 0)
@@ -188,6 +200,7 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(third_red_room_count, 0)
 
     def test_reallocate_person_to_ls(self):
+        """Test the reallocation of a person from a living space to another."""
         Dojo.create_room('living', ['red'])
         initial_red_room_count = len(
             Dojo.all_living_space[0].room_members)
@@ -210,6 +223,7 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(third_red_room_count, 0)
 
     def test_load_people(self):
+        """Test the allocation of a person to a room from a text file."""
         Dojo.create_room('living', ['red'])
         Dojo.create_room('office', ['blue'])
         initial_red_room_count = len(
@@ -228,6 +242,7 @@ class TestDojo(unittest.TestCase):
         self.assertEqual(second_red_room_count, 4)
 
     def test_save_state(self):
+        """Test the saving of all data in the app to a database."""
         Dojo.create_room('living', ['red', 'green'])
         Dojo.create_room('office', ['blue'])
         Dojo.add_person_input_check('mumeen', 'olasode', 'staff')
