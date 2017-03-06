@@ -1,6 +1,11 @@
+"""This module is imported to the test script to test the functionalities."""
+
+
 import unittest
+import os
 
 from app.dojo import Dojo
+from database.database import (DbConnector, PersonData, LivingSpaceData)
 
 
 class TestDojo(unittest.TestCase):
@@ -244,9 +249,38 @@ class TestDojo(unittest.TestCase):
     def test_save_state(self):
         """Test the saving of all data in the app to a database."""
         Dojo.create_room('living', ['red', 'green'])
-        Dojo.create_room('office', ['blue'])
-        Dojo.add_person_input_check('mumeen', 'olasode', 'staff')
-        Dojo.add_person_input_check('ichiato', 'ikikin', 'staff')
-        Dojo.add_person_input_check('bolaji', 'olajide', 'fellow', 'y')
         Dojo.add_person_input_check('ladi', 'adeniran', 'fellow', 'y')
         Dojo.save_state()
+        database = DbConnector('database/db.sqlite3')
+        database_session = database.Session
+        for instance in database_session.query(LivingSpaceData):
+            saved_data = instance.living_space_objs
+            first_room_name = saved_data[0].room_name
+            second_room_name = saved_data[1].room_name
+            self.assertEqual(second_room_name, 'green')
+            self.assertEqual(first_room_name, 'red')
+        database_session.close()
+        for instance in database_session.query(PersonData):
+            saved_data = instance.person_objs
+            database_person_id = list(saved_data)[0]
+            database_fullname = saved_data[database_person_id].full_name
+            dojo_person_id = list(Dojo.all_persons_in_dojo)[0]
+            dojo_fullname = Dojo.all_persons_in_dojo[dojo_person_id].full_name
+            self.assertEqual(database_fullname, dojo_fullname)
+        database_session.close()
+        os.remove("database/db.sqlite3")
+
+    def test_load_state(self):
+        """Test the Loading of all data from the database to the app."""
+        Dojo.create_room('living', ['red', 'green'])
+        Dojo.add_person_input_check('ladi', 'adeniran', 'fellow', 'y')
+        Dojo.add_person_input_check('bolaji', 'olajide', 'fellow', 'y')
+        initial_unallocated_count = len(Dojo.unallocated_persons)
+        self.assertEqual(initial_unallocated_count, 2)
+        print(Dojo.save_state())
+        self.tearDown()
+        second_unallocated_count = len(Dojo.unallocated_persons)
+        self.assertEqual(second_unallocated_count, 0)
+        Dojo.load_state('db')
+        third_unallocated_count = len(Dojo.unallocated_persons)
+        self.assertEqual(third_unallocated_count, 2)
