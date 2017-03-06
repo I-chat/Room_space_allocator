@@ -1,11 +1,14 @@
+"""This module is imported to the test script to test the functionalities."""
+
+
 import operator
 import os.path
 import random
 
 from app.person import Fellow, Staff
 from app.room import LivingSpace, Office
-from database.database import (DojoData, DbConnector, UnallocatedData,
-                               PersonData, RoomData)
+from database.database import (OfficeData, DbConnector, UnallocatedData,
+                               PersonData, LivingSpaceData)
 
 
 class Dojo(object):
@@ -43,14 +46,14 @@ class Dojo(object):
         if wants_accomodation == 'y' or wants_accomodation == 'n':
             if person_type == 'fellow':
                 if first_name.isalpha() and last_name.isalpha():
-                    cls.add_fellow(first_name, last_name,
-                                   person_type, wants_accomodation)
+                    return(cls.add_fellow(first_name, last_name,
+                                          person_type, wants_accomodation))
                 else:
                     return('First name and last name can only be alphabets.')
             elif person_type == 'staff':
                 if first_name.isalpha() and last_name.isalpha():
-                    cls.add_staff(first_name, last_name,
-                                  person_type, wants_accomodation)
+                    return(cls.add_staff(first_name, last_name,
+                                         person_type, wants_accomodation))
             else:
                 return('A person can only be a fellow or a staff.')
         else:
@@ -108,7 +111,7 @@ class Dojo(object):
                 return(new_person.full_name + ' with I.D number '
                        + unique_id + ' has been allocated the '
                        + person_office.room_type + ' '
-                       + person_office.room_name + '\n Only an Office was '
+                       + person_office.room_name + '\nOnly an Office was '
                        'allocated. No available Living Space.')
             else:
                 cls.all_persons_in_dojo[unique_id] = new_person
@@ -120,8 +123,8 @@ class Dojo(object):
                     new_person.full_name, 'Office']
                 return(new_person.full_name + ' with I.D number '
                        + unique_id + ' has been allocated the '
-                       + person_living.room_type + ' '
-                       + person_living.room_name + '\n Only a Living Space '
+                       + 'living space' + ' '
+                       + person_living.room_name + '\nOnly a Living Space '
                        'was allocated. No available Office.')
         else:
             person_office = cls.get_available_room('office')
@@ -147,7 +150,9 @@ class Dojo(object):
         new_person = Staff(first_name, last_name)
         unique_id = cls.id_generator(person_type)
         person_office = cls.get_available_room('office')
-        if wants_accomodation == 'y' and person_office:
+        if wants_accomodation == 'y' and not person_office:
+            return('Sorry. Only fellows can have a living space.')
+        elif wants_accomodation == 'y' and person_office:
             cls.all_persons_in_dojo[unique_id] = new_person
             person_office.room_members[unique_id] = new_person
             output = '\nSorry. Only fellows can have a living space.'
@@ -208,13 +213,13 @@ class Dojo(object):
     @classmethod
     def print_allocations(cls, filename=''):
         """Get a list of rooms and their respective occupants."""
-        if '.txt' in filename:
-            path = 'data/' + filename
-        else:
-            path = 'data/' + filename + '.txt'
         combine_rooms = cls.all_living_space + cls.all_office
         if filename:
-            print('logging all allocated persons to ' + filename + '...')
+            if '.txt' in filename:
+                path = 'data/' + filename
+            else:
+                path = 'data/' + filename + '.txt'
+            print('logging all allocated persons to ' + path + '...')
             my_file = open(path, 'w')
             for room in combine_rooms:
                 if len(room.room_members) > 0:
@@ -225,8 +230,8 @@ class Dojo(object):
                                            room.room_members.values()]) + '\n')
                     my_file.write(output)
                     my_file.close()
-                else:
-                    return('There are no occupants in any room.')
+            else:
+                return('There are no occupants in any room.')
         else:
             for room in combine_rooms:
                 if len(room.room_members) > 0:
@@ -237,19 +242,19 @@ class Dojo(object):
                             [obj.full_name for obj in
                                 room.room_members.values()]) + '\n')
                     return(output)
-                else:
-                    return('There are no occupants in any room.')
+            else:
+                return('There are no occupants in any room.')
 
     @classmethod
     def print_unallocated(cls, filename=''):
         """Get a list of unallocated persons."""
-        if '.txt' in filename:
-            path = 'data/' + filename
-        else:
-            path = 'data/' + filename + '.txt'
         if filename:
-            head = 'UNALLOCATED LIST\n'
-            head = head + ('-' * 30) + '\n'
+            if '.txt' in filename:
+                path = 'data/' + filename
+            else:
+                path = 'data/' + filename + '.txt'
+                head = 'UNALLOCATED LIST\n'
+                head = head + ('-' * 30) + '\n'
             if len(cls.unallocated_persons) > 0:
                 print('logging all allocated persons to ' + path + '...')
                 my_file = open(path, 'w')
@@ -358,38 +363,53 @@ class Dojo(object):
     @classmethod
     def save_state(cls, database_name='db'):
         """Persist all current data in the app to a database."""
+        print('Saving current state to database....')
+        path = 'database/' + database_name + '.sqlite3'
+        if os.path.isfile(path):
+            return("Permission Denied. You specified an already existing"
+                   "database. Kindly choose another.")
+        else:
+            database = DbConnector(path)
+
+        database_session = database.Session
+
+        living_space_list = LivingSpaceData(
+            living_space_objs=cls.all_living_space)
+        database_session.add(living_space_list)
+        database_session.commit()
+
+        office_list = OfficeData(office_objs=cls.all_office)
+        database_session.add(office_list)
+        database_session.commit()
+
+        person_dict = PersonData(person_objs=cls.all_persons_in_dojo)
+        database_session.add(person_dict)
+        database_session.commit()
+
+        unallocated = UnallocatedData(person_objs=cls.unallocated_persons)
+        database_session.add(unallocated)
+        database_session.commit()
+
+        return("The current state has been successfully saved."
+               "You can now quit the application.")
+
+    @classmethod
+    def load_state(cls, database_name):
+        """Query and load all app data from database back to the app."""
+        print("Loading past state from database....")
         path = 'database/' + database_name + '.sqlite3'
         database = DbConnector(path)
 
         database_session = database.Session
-
-        combine_rooms = cls.all_office + cls.all_living_space
-
-        for room in combine_rooms:
-            new_person = RoomData(name=room.room_name,
-                                  room_type=room.room_type,
-                                  members=room.room_members)
-            database_session.add(new_person)
-            database_session.commit()
-
-        for key, value in cls.all_persons_in_dojo.items():
-            new_person = PersonData(person_id=key, firstname=value.full_name,
-                                    lastname=value.last_name,
-                                    fullname=value.full_name,
-                                    person_type=value.person_type,
-                                    assigned_room=value.assigned_room)
-            database_session.add(new_person)
-            database_session.commit()
-
-        person_dict = DojoData(person_obj=cls.all_persons_in_dojo)
-        database_session.add(person_dict)
-        database_session.commit()
-
-        unallocated = UnallocatedData(person_obj=cls.unallocated_persons)
-        database_session.add(unallocated)
-        database_session.commit()
-
-    @classmethod
-    def load_state(cls, database_name='db'):
-        path = 'database/' + database_name + '.sqlite3'
-        s
+        for instance in database_session.query(OfficeData):
+            cls.all_office = instance.office_objs
+        database_session.close()
+        for instance in database_session.query(LivingSpaceData):
+            cls.all_living_space = instance.living_space_objs
+        database_session.close()
+        for instance in database_session.query(PersonData):
+            cls.all_persons_in_dojo = instance.person_objs
+        database_session.close()
+        for instance in database_session.query(UnallocatedData):
+            cls.unallocated_persons = instance.person_objs
+        database_session.close()
