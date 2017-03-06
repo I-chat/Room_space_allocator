@@ -1,41 +1,41 @@
-from sqlalchemy import Column, Integer, PickleType, String, create_engine
+"""This module handles the creation is database tables, mapping of objects.
+
+to respective tables and creating a connection to the database.
+"""
+
+
+from sqlalchemy import Column, Integer, PickleType, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
 
+class OfficeData(Base):
+    """Declare a mapping for Office objects."""
+
+    __tablename__ = 'office'
+
+    office_id = Column(Integer, primary_key=True)
+    office_objs = Column(PickleType)
+
+
+class LivingSpaceData(Base):
+    """Declare a mapping for LivingSpace objects."""
+
+    __tablename__ = 'living space'
+
+    living_space_id = Column(Integer, primary_key=True)
+    living_space_objs = Column(PickleType)
+
+
 class PersonData(Base):
-    """Declare a mapping for Fellow and Staff objects."""
-
-    __tablename__ = 'person'
-
-    person_id = Column(String, primary_key=True)
-    firstname = Column(String)
-    lastname = Column(String)
-    fullname = Column(String)
-    person_type = Column(String)
-    assigned_room = Column(PickleType)
-
-
-class RoomData(Base):
-    """Declare a mapping for LivingSpace and Office objects."""
-
-    __tablename__ = 'room'
-
-    room_id = Column(Integer, primary_key=True)
-    name = Column(String)
-    room_type = Column(String)
-    members = Column(PickleType)
-
-
-class DojoData(Base):
     """Declare a mapping for persons_in_dojo in dojo dictionary."""
 
     __tablename__ = 'persons_in_dojo'
 
     person_id = Column(Integer, primary_key=True)
-    person_obj = Column(PickleType)
+    person_objs = Column(PickleType)
 
 
 class UnallocatedData(Base):
@@ -44,7 +44,7 @@ class UnallocatedData(Base):
     __tablename__ = 'unallocated_persons'
 
     person_id = Column(Integer, primary_key=True)
-    person_obj = Column(PickleType)
+    person_objs = Column(PickleType)
 
 
 class DbConnector(object):
