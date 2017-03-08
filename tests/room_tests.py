@@ -250,7 +250,7 @@ class TestDojo(unittest.TestCase):
         """Test the saving of all data in the app to a database."""
         Dojo.create_room('living', ['red', 'green'])
         Dojo.add_person_input_check('ladi', 'adeniran', 'fellow', 'y')
-        Dojo.save_state()
+        Dojo.save_state('test_db')
         database = DbConnector('database/db.sqlite3')
         database_session = database.Session
         for instance in database_session.query(LivingSpaceData):
@@ -277,10 +277,10 @@ class TestDojo(unittest.TestCase):
         Dojo.add_person_input_check('bolaji', 'olajide', 'fellow', 'y')
         initial_unallocated_count = len(Dojo.unallocated_persons)
         self.assertEqual(initial_unallocated_count, 2)
-        print(Dojo.save_state())
+        Dojo.save_state('test_db')
         self.tearDown()
         second_unallocated_count = len(Dojo.unallocated_persons)
         self.assertEqual(second_unallocated_count, 0)
-        Dojo.load_state('db')
+        Dojo.load_state('test_db')
         third_unallocated_count = len(Dojo.unallocated_persons)
         self.assertEqual(third_unallocated_count, 2)
