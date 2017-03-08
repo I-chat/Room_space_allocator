@@ -46,6 +46,61 @@ class TestDojo(unittest.TestCase):
                          '\nRoom already exist.\n')
         self.assertEqual(fourth_room_count, 2)
 
+    def test_remove_person(self):
+        """Remove a persons data from the system."""
+        Dojo.create_room('office', ['octavia'])
+        Dojo.add_person_input_check('luke', 'skywalker', 'fellow', 'y')
+        initial_room_count = len(Dojo.all_office[0].room_members)
+        self.assertEqual(initial_room_count, 1)
+        initial_dojo_count = len(Dojo.all_persons_in_dojo)
+        self.assertEqual(initial_dojo_count, 1)
+        initial_unallocated_count = len(Dojo.unallocated_persons)
+        self.assertEqual(initial_unallocated_count, 1)
+        person_id = list(Dojo.all_persons_in_dojo.keys())[0]
+        Dojo.remove_person(person_id)
+        second_room_count = len(Dojo.all_office[0].room_members)
+        self.assertEqual(second_room_count, 0)
+        second_dojo_count = len(Dojo.all_persons_in_dojo)
+        self.assertEqual(second_dojo_count, 0)
+        second_unallocated_count = len(Dojo.unallocated_persons)
+        self.assertEqual(second_unallocated_count, 0)
+
+    def test_remove_person2(self):
+        """Remove a persons data from the system."""
+        Dojo.create_room('living', ['octavia'])
+        Dojo.create_room('office', ['cyan'])
+        Dojo.add_person_input_check('luke', 'skywalker', 'fellow', 'y')
+        initial_room_count = len(Dojo.all_living_space[0].room_members)
+        self.assertEqual(initial_room_count, 1)
+        initial_dojo_count = len(Dojo.all_persons_in_dojo)
+        self.assertEqual(initial_dojo_count, 1)
+        initial_cyan_count = len(Dojo.all_office[0].room_members)
+        self.assertEqual(initial_cyan_count, 1)
+        person_id = list(Dojo.all_persons_in_dojo.keys())[0]
+        Dojo.remove_person(person_id)
+        second_room_count = len(Dojo.all_living_space[0].room_members)
+        self.assertEqual(second_room_count, 0)
+        second_dojo_count = len(Dojo.all_persons_in_dojo)
+        self.assertEqual(second_dojo_count, 0)
+        second_cyan_count = len(Dojo.all_living_space[0].room_members)
+        self.assertEqual(second_cyan_count, 0)
+
+    def test_print_all_persons(self):
+        """Print all persons in dojo to the screen."""
+        Dojo.create_room('living', ['octavia'])
+        Dojo.create_room('office', ['cyan'])
+        Dojo.add_person_input_check('mumeen', 'olasode', 'staff')
+        Dojo.add_person_input_check('ichiato', 'ikikin', 'staff')
+        Dojo.add_person_input_check('falz', 'thabadguy', 'staff')
+        Dojo.add_person_input_check('valentine', 'mbonu', 'staff')
+        Dojo.add_person_input_check('bolaji', 'olajide', 'fellow', 'y')
+        result = Dojo.print_all_persons()
+        self.assertTrue('mumeen olasode' in result)
+        self.assertTrue('ichiato ikikin' in result)
+        self.assertTrue('falz thabadguy' in result)
+        self.assertTrue('valentine mbonu' in result)
+        self.assertTrue('bolaji olajide' in result)
+
     def test_create_ls(self):
         """Test the creation of living space functionality in Dojo."""
         initial_room_count = len(Dojo.all_living_space)
@@ -173,17 +228,17 @@ class TestDojo(unittest.TestCase):
         my_file = open('data/test_output.txt')
         content = my_file.read()
         my_file.close()
-        self.assertEqual(content[59:], self.longStr2)
+        self.assertEqual(content[59:], "bolaji olajide: living space\n")
 
     def test_print_unallocated(self):
         """Test the printing of all persons who are yet to be given a room."""
         Dojo.create_room('office', ['red'])
         Dojo.add_person_input_check('bolaji', 'olajide', 'fellow', 'y')
         content = Dojo.print_unallocated()
-        self.assertEqual(content[59:], self.longStr2)
+        self.assertEqual(content[59:], "bolaji olajide: living space\n")
 
     def test_rellocate_person_to_office(self):
-        """Test the reallocation of a person from an office to another."""
+        """Test the rellocation of a person from an office to another."""
         Dojo.create_room('office', ['red'])
         initial_red_room_count = len(Dojo.all_office[0].room_members)
         self.assertEqual(initial_red_room_count, 0)
@@ -194,14 +249,44 @@ class TestDojo(unittest.TestCase):
         Dojo.create_room('office', ['green'])
         initial_green_room_count = len(Dojo.all_office[1].room_members)
         self.assertEqual(initial_green_room_count, 0)
-        Dojo.rellocate_person(person_id, 'green')
+        Dojo.reallocate_person(person_id, 'green')
         second_green_room_count = len(Dojo.all_office[1].room_members)
         third_red_room_count = len(Dojo.all_office[0].room_members)
         self.assertEqual(second_green_room_count, 1)
         self.assertEqual(third_red_room_count, 0)
 
+    def test_reallocate_person_to_office(self):
+        """Test the reallocation of a person to an office."""
+        Dojo.add_person_input_check('ladi', 'adeniran', 'staff')
+        initial_unallocated_count = len(Dojo.unallocated_persons)
+        self.assertEqual(initial_unallocated_count, 1)
+        Dojo.create_room('office', ['cyan'])
+        initial_cyan_room_count = len(Dojo.all_office[0].room_members)
+        self.assertEqual(initial_cyan_room_count, 0)
+        person_id = list(Dojo.all_persons_in_dojo.keys())[0]
+        Dojo.reallocate_person(person_id, 'cyan')
+        second_unallocated_count = len(Dojo.unallocated_persons)
+        second_cyan_room_count = len(Dojo.all_office[0].room_members)
+        self.assertEqual(second_unallocated_count, 0)
+        self.assertEqual(second_cyan_room_count, 1)
+
+    def test_reallocate_person_to_ls(self):
+        """Test the reallocation of a person to a living space."""
+        Dojo.add_person_input_check('koya', 'gboyega', 'fellow', 'y')
+        person_id = list(Dojo.all_persons_in_dojo.keys())[0]
+        initial_unallocated_count = len(Dojo.unallocated_persons[person_id])
+        self.assertEqual(initial_unallocated_count, 3)
+        Dojo.create_room('living', ['cyan'])
+        initial_cyan_room_count = len(Dojo.all_living_space[0].room_members)
+        self.assertEqual(initial_cyan_room_count, 0)
+        Dojo.reallocate_person(person_id, 'cyan')
+        second_unallocated_count = len(Dojo.unallocated_persons[person_id])
+        second_cyan_room_count = len(Dojo.all_living_space[0].room_members)
+        self.assertEqual(second_unallocated_count, 2)
+        self.assertEqual(second_cyan_room_count, 1)
+
     def test_rellocate_person_to_ls(self):
-        """Test the reallocation of a person from a living space to another."""
+        """Test the rellocation of a person from a living space to another."""
         Dojo.create_room('living', ['red'])
         initial_red_room_count = len(
             Dojo.all_living_space[0].room_members)
@@ -215,7 +300,7 @@ class TestDojo(unittest.TestCase):
         initial_green_room_count = len(
             Dojo.all_living_space[1].room_members)
         self.assertEqual(initial_green_room_count, 0)
-        Dojo.rellocate_person(person_id, 'green')
+        Dojo.reallocate_person(person_id, 'green')
         second_green_room_count = len(
             Dojo.all_living_space[1].room_members)
         third_red_room_count = len(
