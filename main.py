@@ -8,8 +8,8 @@ Usage:
     room_allocator add_person <person_first_name> <person_last_name>
     <fellow|staff> [--wants_accomodation=n]
     room_allocator print_room <room_name>
-    room_allocator print_allocations [--o=filename]
-    room_allocator print_unallocated [--o=filename]
+    room_allocator print_allocations [-o=filename]
+    room_allocator print_unallocated [-o=filename]
     room_allocator reallocate_person <person_identifier> <new_room_name>
     room_allocator load_people <--o=filename>
     room_allocator save_state [--db=sqlite_database]
@@ -59,7 +59,7 @@ def docopt_cmd(func):
 class MyInteractive (cmd.Cmd):
     """Enter Interactive mode."""
 
-    intro = 'Welcome to my Room Allocator!' \
+    intro = 'Welcome to Room Allocator!' \
         + ' (type help for a list of commands.)'
     prompt = '(Room Allocator) '
     file = None
@@ -103,43 +103,46 @@ class MyInteractive (cmd.Cmd):
     @docopt_cmd
     def do_print_room(self, arg):
         """Usage: print_room <room_name>"""
-        room_name = arg["<room_name>"]
-        print(Dojo.print_room(room_name))
+        room_name = arg["<room_name>"].lower()
+        if room_name.isalnum():
+            print(Dojo.print_room(room_name))
+        else:
+            print('Room name should only contain alphanumeric characters.')
 
     @docopt_cmd
     def do_print_allocations(self, arg):
-        """Usage: print_allocations [<--o>]  """
-        file_name = arg['<--o>']
+        """Usage: print_allocations [--o=<filename>]"""
+        file_name = arg['--o']
         print(Dojo.print_allocations(file_name))
 
     @docopt_cmd
     def do_print_unallocated(self, arg):
-        """Usage: print_unallocated [--o=filename] """
+        """Usage: print_unallocated [--o=<filename>]"""
         filename = arg['--o']
         print(Dojo.print_unallocated(filename))
 
     @docopt_cmd
     def do_reallocate_person(self, arg):
-        """Usage: reallocate_person <person_identifier> <new_room_name>."""
-        person_id = arg["<person_identifier>"]
-        room_name = arg["<new_room_name>"]
+        """Usage: reallocate_person <person_identifier> <new_room_name>"""
+        person_id = arg["<person_identifier>"].upper()
+        room_name = arg["<new_room_name>"].lower()
         print(Dojo.reallocate_person(person_id, room_name))
 
     @docopt_cmd
     def do_load_people(self, arg):
-        """Usage: load_people [--o=filename]"""
-        filename = arg["--o"]
+        """Usage: load_people <filename>"""
+        filename = arg["<filename>"]
         print(Dojo.load_people(filename))
 
     @docopt_cmd
     def do_save_state(self, arg):
-        """Usage: save_state [--db=sqlite_database]."""
+        """Usage: save_state [--db=<sqlite_database>]"""
         database_name = arg["--db"]
         print(Dojo.save_state(database_name))
 
     @docopt_cmd
     def do_load_state(self, arg):
-        """"Usage: load_state <sqlite_database>."""
+        """"Usage: load_state <sqlite_database>"""
         database_name = arg["<sqlite_database>"]
         print(Dojo.load_state(database_name))
 
