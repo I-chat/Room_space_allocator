@@ -10,11 +10,13 @@ Usage:
     room_allocator print_room <room_name>
     room_allocator print_allocations [-o=filename]
     room_allocator print_unallocated [-o=filename]
+    room_allocator print_all_persons
+    room_allocator remove_person <person_identifier>
     room_allocator reallocate_person <person_identifier> <new_room_name>
     room_allocator load_people <--o=filename>
     room_allocator save_state [--db=sqlite_database]
     room_allocator load_state <sqlite_database>
-    room_allocator (-h | --help | --version)
+    room_allocator (-h | --help)
 Options:
     -h, --help  Show this screen and exit.
 """
@@ -68,7 +70,7 @@ class MyInteractive (cmd.Cmd):
     def do_create_room(self, arg):
         """Usage: create_room <room_type> <room_name>..."""
         room_name = arg["<room_name>"]
-        room_type = arg["<room_type>"]
+        room_type = arg["<room_type>"].lower()
         if room_type == 'office' or room_type == 'living':
             if all([x.isalnum() for x in room_name]):
                 print(Dojo.create_room(room_type, room_name))
@@ -136,13 +138,13 @@ class MyInteractive (cmd.Cmd):
 
     @docopt_cmd
     def do_remove_person(self, arg):
-        """Usage: remove_person <person_id>"""
-        person_id = arg["<person_id>"]
+        """Usage: remove_person <person_identifier>"""
+        person_id = arg["<person_identifier>"]
         print(Dojo.remove_person(person_id))
 
     @docopt_cmd
-    def do_print_all_persons(self):
-        """Print all person to screen."""
+    def do_print_all_persons(self, arg):
+        """Usage: print_all_persons"""
         print(Dojo.print_all_persons())
 
     @docopt_cmd

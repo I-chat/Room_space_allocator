@@ -2,7 +2,7 @@
 
 
 import operator
-import os.path
+import os
 import random
 
 from app.person import Fellow, Staff
@@ -25,18 +25,19 @@ class Dojo(object):
         output = ""
         for name in room_name:
             combine_rooms = cls.all_office + cls.all_living_space
-            if name in [room.room_name for room in combine_rooms]:
+            if name.lower() in [room.room_name for room in combine_rooms]:
                 output = output + ('Room already exist.\n')
             elif room_type == 'office':
-                new_room = Office(name)
+                new_room = Office(name.lower())
                 cls.all_office.append(new_room)
                 output = output + \
-                    ('An office called %s has been created.\n' % name)
+                    ('An office called %s has been created.\n' % name.upper())
             elif room_type == 'living':
-                new_room = LivingSpace(name)
+                new_room = LivingSpace(name.lower())
                 cls.all_living_space.append(new_room)
                 output = output + \
-                    ('A living space called %s has been created.\n' % name)
+                    ('A living space called %s has been created.\n' %
+                     name.upper())
         return output
 
     @classmethod
@@ -108,15 +109,15 @@ class Dojo(object):
                     return(cls.add_fellow(first_name, last_name,
                                           person_type, wants_accomodation))
                 else:
-                    return('First name and last name can only be alphabets.')
+                    return('First name and last name can only be alphabets.\n')
             elif person_type == 'staff':
                 if first_name.isalpha() and last_name.isalpha():
                     return(cls.add_staff(first_name, last_name,
                                          person_type, wants_accomodation))
             else:
-                return('A person can only be a fellow or a staff.')
+                return('A person can only be a fellow or a staff.\n')
         else:
-            return("wants_accomodation can only be 'Y' or 'N'.")
+            return("wants_accomodation can only be 'Y' or 'N'.\n")
 
     @classmethod
     def id_generator(cls, person_type):
@@ -153,12 +154,12 @@ class Dojo(object):
                        + unique_id + ' has been allocated the '
                        + 'living space' + ' '
                        + person_living.room_name + ' and ' + 'an office '
-                       + 'called ' + person_office.room_name)
+                       + 'called ' + person_office.room_name + '\n')
             elif person_office is None and person_living is None:
                 cls.all_persons_in_dojo[unique_id] = new_person
                 cls.unallocated_persons[unique_id] = [
                     new_person.full_name, 'living space', 'office']
-                return('No office and living room available.')
+                return('No office and living room available.\n')
             elif person_office:
                 cls.all_persons_in_dojo[unique_id] = new_person
                 person_office.room_members[
@@ -170,8 +171,8 @@ class Dojo(object):
                 return(new_person.full_name + ' with I.D number '
                        + unique_id + ' has been allocated the '
                        + person_office.room_type + ' '
-                       + person_office.room_name + '\nOnly an Office was '
-                       'allocated. No available Living Space.')
+                       + person_office.room_name + '.Only an Office was '
+                       'allocated. No available Living Space.\n')
             else:
                 cls.all_persons_in_dojo[unique_id] = new_person
                 person_living.room_members[
@@ -183,8 +184,8 @@ class Dojo(object):
                 return(new_person.full_name + ' with I.D number '
                        + unique_id + ' has been allocated the '
                        + 'living space' + ' '
-                       + person_living.room_name + '\nOnly a Living Space '
-                       'was allocated. No available Office.')
+                       + person_living.room_name + '.Only a Living Space '
+                       'was allocated. No available Office.\n')
         else:
             person_office = cls.get_available_room('office')
             if person_office:
@@ -196,12 +197,12 @@ class Dojo(object):
                 return(new_person.full_name + ' with I.D number '
                        + unique_id + ' has been allocated the '
                        + person_office.room_type + ' '
-                       + person_office.room_name)
+                       + person_office.room_name + '\n')
             else:
                 cls.all_persons_in_dojo[unique_id] = new_person
                 cls.unallocated_persons[
                     unique_id] = [new_person.full_name, 'office']
-                return('No Office available.')
+                return('No Office available.\n')
 
     @classmethod
     def add_staff(cls, first_name, last_name, person_type,
@@ -211,7 +212,7 @@ class Dojo(object):
         unique_id = cls.id_generator(person_type)
         person_office = cls.get_available_room('office')
         if wants_accomodation == 'y' and not person_office:
-            return('Sorry. Only fellows can have a living space.')
+            return('Sorry. Only fellows can have a living space.\n')
         elif wants_accomodation == 'y' and person_office:
             cls.all_persons_in_dojo[unique_id] = new_person
             person_office.room_members[unique_id] = new_person
@@ -219,19 +220,20 @@ class Dojo(object):
             return(new_person.full_name + ' with I.D number '
                    + unique_id + ' has been allocated the '
                    + person_office.room_type + ' '
-                   + person_office.room_name + output)
+                   + person_office.room_name + output + '\n')
         elif person_office:
             cls.all_persons_in_dojo[unique_id] = new_person
             person_office.room_members[unique_id] = new_person
             new_person.assigned_room['my_office'] = person_office
             return(new_person.full_name + ' with I.D number '
                    + unique_id + ' has been allocated the '
-                   + person_office.room_type + ' ' + person_office.room_name)
+                   + person_office.room_type + ' ' + person_office.room_name
+                   + '\n')
         else:
             cls.unallocated_persons[
                 unique_id] = [new_person.full_name, 'office']
             cls.all_persons_in_dojo[unique_id] = new_person
-            return('No office is available.')
+            return('No office is available.\n')
 
     @classmethod
     def get_available_room(cls, room_type):
@@ -254,9 +256,9 @@ class Dojo(object):
     def print_room(cls, room_name):
         """Get any given room if created and print out the occupants if any."""
         combine_rooms = cls.all_living_space + cls.all_office
-        if any(x.room_name == room_name for x in combine_rooms):
+        if any(x.room_name == room_name.lower() for x in combine_rooms):
             for room in combine_rooms:
-                if room.room_name == room_name:
+                if room.room_name == room_name.lower():
                     if not any(room.room_members):
                         return ('There are no occupants in ' +
                                 room.room_name + ' at the moment.')
@@ -435,23 +437,31 @@ class Dojo(object):
     def load_people(cls, filename):
         """Allocate people to rooms directly from a text file."""
         if '.txt' in filename:
-            path = 'data/' + filename
+            paths = 'data/' + filename
         else:
-            path = 'data/' + filename + '.txt'
+            paths = 'data/' + filename + '.txt'
 
-        if os.path.isfile(path):
-            my_file = open(path)
+        if os.path.isfile(paths):
+            my_file = open(paths)
+            output = ""
             for line in my_file:
                 arg = line.split()
                 if len(arg) == 4:
-                    cls.add_person_input_check(arg[0], arg[1], arg[2], arg[3])
+                    output += cls.add_person_input_check(arg[0].lower(),
+                                                         arg[1].lower(),
+                                                         arg[2].lower(),
+                                                         arg[3].lower())
                 elif len(arg) == 3:
-                    cls.add_person_input_check(arg[0], arg[1], arg[2],
-                                               wants_accomodation='n')
+                    output += cls.add_person_input_check(arg[0].lower(),
+                                                         arg[1].lower(),
+                                                         arg[2].lower(),
+                                                         wants_accomodation='n'
+                                                         )
                 else:
-                    return("Incorrect length of parameters.")
+                    output += "Incorrect length of parameters."
+            return output
         else:
-            return("No file named ", filename, " in the data folder.")
+            return("No file named " + filename + " in the data folder.")
 
     @classmethod
     def save_state(cls, database_name):
