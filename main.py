@@ -10,7 +10,7 @@ Usage:
     room_allocator print_room <room_name>
     room_allocator print_allocations [-o=filename]
     room_allocator print_unallocated [-o=filename]
-    room_allocator reallocate_person <person_identifier> <new_room_name>
+    room_allocator rellocate_person <person_identifier> <new_room_name>
     room_allocator load_people <--o=filename>
     room_allocator save_state [--db=sqlite_database]
     room_allocator load_state <sqlite_database>
@@ -122,11 +122,11 @@ class MyInteractive (cmd.Cmd):
         print(Dojo.print_unallocated(filename))
 
     @docopt_cmd
-    def do_reallocate_person(self, arg):
-        """Usage: reallocate_person <person_identifier> <new_room_name>"""
+    def do_rellocate_person(self, arg):
+        """Usage: rellocate_person <person_identifier> <new_room_name>"""
         person_id = arg["<person_identifier>"].upper()
         room_name = arg["<new_room_name>"].lower()
-        print(Dojo.reallocate_person(person_id, room_name))
+        print(Dojo.rellocate_person(person_id, room_name))
 
     @docopt_cmd
     def do_load_people(self, arg):
