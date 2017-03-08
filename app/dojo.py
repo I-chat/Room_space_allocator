@@ -42,7 +42,46 @@ class Dojo(object):
     @classmethod
     def remove_person(cls, person_id):
         """Remove a person from dojo."""
-        if person_id in cls.all_persons_in_dojo:
+        if person_id in cls.all_persons_in_dojo and\
+                person_id in cls.unallocated_persons:
+            if len(cls.all_persons_in_dojo[person_id].assigned_room) == 2:
+                del cls.all_persons_in_dojo[
+                    person_id].assigned_room['my_living'].room_members[
+                    person_id]
+                del cls.all_persons_in_dojo[
+                    person_id].assigned_room['my_office'].room_members[
+                    person_id]
+            elif len(cls.all_persons_in_dojo[person_id].assigned_room) == 1:
+                if 'my_office' in cls.all_persons_in_dojo[
+                        person_id].assigned_room:
+                    del cls.all_persons_in_dojo[
+                        person_id].assigned_room['my_office'].room_members[
+                        person_id]
+                else:
+                    del cls.all_persons_in_dojo[
+                        person_id].assigned_room['my_living'].room_members[
+                        person_id]
+            del cls.all_persons_in_dojo[person_id]
+            del cls.unallocated_persons[person_id]
+            return(person_id + " has been successfully removed.")
+        elif person_id in cls.all_persons_in_dojo:
+            if len(cls.all_persons_in_dojo[person_id].assigned_room) == 2:
+                del cls.all_persons_in_dojo[
+                    person_id].assigned_room['my_living'].room_members[
+                    person_id]
+                del cls.all_persons_in_dojo[
+                    person_id].assigned_room['my_office'].room_members[
+                    person_id]
+            elif len(cls.all_persons_in_dojo[person_id].assigned_room) == 1:
+                if 'my_office' in cls.all_persons_in_dojo[
+                        person_id].assigned_room:
+                    del cls.all_persons_in_dojo[
+                        person_id].assigned_room['my_office'].room_members[
+                        person_id]
+                else:
+                    del cls.all_persons_in_dojo[
+                        person_id].assigned_room['my_living'].room_members[
+                        person_id]
             del cls.all_persons_in_dojo[person_id]
             return(person_id + " has been successfully removed.")
         else:
@@ -116,10 +155,9 @@ class Dojo(object):
                        + person_living.room_name + ' and ' + 'an office '
                        + 'called ' + person_office.room_name)
             elif person_office is None and person_living is None:
+                cls.all_persons_in_dojo[unique_id] = new_person
                 cls.unallocated_persons[unique_id] = [
-                    new_person.full_name, 'Living Space']
-                cls.unallocated_persons[unique_id] = [
-                    new_person.full_name, 'Office']
+                    new_person.full_name, 'living space', 'office']
                 return('No office and living room available.')
             elif person_office:
                 cls.all_persons_in_dojo[unique_id] = new_person
@@ -141,7 +179,7 @@ class Dojo(object):
                 new_person.assigned_room[
                     'my_living'] = person_living
                 cls.unallocated_persons[unique_id] = [
-                    new_person.full_name, 'Office']
+                    new_person.full_name, 'office']
                 return(new_person.full_name + ' with I.D number '
                        + unique_id + ' has been allocated the '
                        + 'living space' + ' '
@@ -160,8 +198,9 @@ class Dojo(object):
                        + person_office.room_type + ' '
                        + person_office.room_name)
             else:
+                cls.all_persons_in_dojo[unique_id] = new_person
                 cls.unallocated_persons[
-                    unique_id] = [new_person.full_name, 'Office']
+                    unique_id] = [new_person.full_name, 'office']
                 return('No Office available.')
 
     @classmethod
@@ -190,7 +229,8 @@ class Dojo(object):
                    + person_office.room_type + ' ' + person_office.room_name)
         else:
             cls.unallocated_persons[
-                unique_id] = [new_person.full_name, 'Office']
+                unique_id] = [new_person.full_name, 'office']
+            cls.all_persons_in_dojo[unique_id] = new_person
             return('No office is available.')
 
     @classmethod
@@ -286,8 +326,9 @@ class Dojo(object):
                 my_file = open(path, 'w')
                 my_file.write(head)
                 for key, value in sorted(cls.unallocated_persons.items()):
-                    my_file.write(('{v0}: {v1}: {v2}\n'.format(
-                        v0=key, v1=value[0], v2=value[1])))
+                    v3_value = ', ' + value[2] if len(value) == 3 else ""
+                    my_file.write(('{v0}: {v1}: {v2}{v3}\n'.format(
+                        v0=key, v1=value[0], v2=value[1], v3=v3_value)))
                 my_file.close()
                 return("Logging of unallocated persons complete.")
             else:
@@ -297,17 +338,17 @@ class Dojo(object):
             head = head + ('-' * 30) + '\n'
             if len(cls.unallocated_persons) > 0:
                 output = ''
+                print(cls.unallocated_persons)
                 for key, value in sorted(cls.unallocated_persons.items()):
-                    output = output + ('{v0}: {v1}: {v2}\n'.format(
-                        v0=key, v1=value[0], v2=value[1]))
+                    v3_value = ', ' + value[2] if len(value) == 3 else ""
+                    output = output + ('{v0}: {v1}: {v2}{v3}\n'.format(
+                        v0=key, v1=value[0], v2=value[1], v3=v3_value))
                 return(head + output)
             else:
                 return('There are no unallocated persons.')
 
     @classmethod
-
-    @classmethod
-    def rellocate_person(cls, person_id, room_name):
+    def reallocate_person(cls, person_id, room_name):
         """Check if room is existing and if there is a vacant space."""
         office_obj = [
             room for room in cls.all_office if room.room_name == room_name]
@@ -315,10 +356,10 @@ class Dojo(object):
             if len(office_obj[0].room_members) == 6:
                 return('Room is already filled to capacity.')
             elif person_id in office_obj[0].room_members:
-                return (person_id + 'is already a member of room'
+                return (person_id + ' is already a member of room '
                         + room_name)
             else:
-                return(cls.rellocate_person_to_office(
+                return(cls.reallocate_person_to_office(
                     person_id, room_name, office_obj[0]))
         elif not office_obj:
             living_obj = [room for room in
@@ -330,7 +371,8 @@ class Dojo(object):
                     return(person_id + 'is already a member of room'
                            + room_name)
                 else:
-                    return(cls.rellocate_person_to_ls(
+                    print(room_name)
+                    return(cls.reallocate_person_to_ls(
                         person_id, room_name, living_obj[0]))
             else:
                 return(room_name, 'does not exist.')
@@ -338,7 +380,7 @@ class Dojo(object):
             return(room_name, 'does not exist.')
 
     @classmethod
-    def rellocate_person_to_office(cls, person_id, room_name, room_obj):
+    def reallocate_person_to_office(cls, person_id, room_name, room_obj):
         """Reallocate a person from one office to another."""
         if person_id in cls.all_persons_in_dojo:
             if 'my_office' in cls.all_persons_in_dojo[person_id].assigned_room:
@@ -349,13 +391,22 @@ class Dojo(object):
                 cls.all_persons_in_dojo[person_id].assigned_room[
                     'my_office'] = room_obj
                 return(person_id + ' has been successfully rellocated.')
+            elif 'office' in cls.unallocated_persons[person_id]:
+                cls.unallocated_persons[person_id].remove('office')
+                if len(cls.unallocated_persons[person_id]) <= 1:
+                    del cls.unallocated_persons[person_id]
+                room_obj.room_members[
+                    person_id] = cls.all_persons_in_dojo[person_id]
+                cls.all_persons_in_dojo[person_id].assigned_room[
+                    'my_office'] = room_obj
+                return(person_id + ' has been successfully reallocated.')
             else:
                 return(person_id + ' is yet to be allocated an office.')
         else:
             return('Invalid identification number')
 
     @classmethod
-    def rellocate_person_to_ls(cls, person_id, room_name, room_obj):
+    def reallocate_person_to_ls(cls, person_id, room_name, room_obj):
         """Reallocate a person from a living space to another."""
         if person_id in cls.all_persons_in_dojo:
             if 'my_living' in cls.all_persons_in_dojo[person_id].assigned_room:
@@ -366,6 +417,15 @@ class Dojo(object):
                 cls.all_persons_in_dojo[person_id].assigned_room[
                     'my_living'] = room_obj
                 return(person_id + ' has been successfully rellocated.')
+            elif 'living space' in cls.unallocated_persons[person_id]:
+                cls.unallocated_persons[person_id].remove('living space')
+                if len(cls.unallocated_persons[person_id]) <= 1:
+                    del cls.unallocated_persons[person_id]
+                room_obj.room_members[
+                    person_id] = cls.all_persons_in_dojo[person_id]
+                cls.all_persons_in_dojo[person_id].assigned_room[
+                    'my_living'] = room_obj
+                return(person_id + ' has been successfully reallocated.')
             else:
                 return(person_id + ' is yet to be allocated a living space.')
         else:
