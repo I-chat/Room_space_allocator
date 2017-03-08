@@ -10,7 +10,9 @@ Room_space_allocator is a python3 program that allocates room based on different
     - **`print_allocations [-o=filename]`** Prints a list of allocations onto the screen. Specifying the optional -o option here outputs the registered allocations to a txt file and stores it in the folder name data.
     - **`print_unallocated [-o=filename]`** Prints a list of unallocated people to the screen. Specifying the -o option here outputs the information to a txt file and stores it in the folder name data.
     - **`reallocate_person <person_identifier> <new_room_name>`** Reallocate the person with person_identifier to new_room_name.
-    - **`load_people`** Adds people to rooms from a load_people txt file in the data folder.
+    - **`remove_person <person_identifier>`** Remove the person with person_identifier from the system.
+    - **`print_all_persons`** Print everyone in the system to the screen.
+    - **`load_people <filename>`** Adds people to rooms from a load_people txt file in the data folder.
     - **`save_state [--db=sqlite_database]`** Stores all the data stored in the app to an SQLite database. Specifying the --db parameter explicitly stores the data in the sqlite_database specified.
     - **`load_state <sqlite_database>`** Loads data from a database into the application.
 
