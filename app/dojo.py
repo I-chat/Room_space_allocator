@@ -92,8 +92,9 @@ class Dojo(object):
                     'my_office'] = person_office
                 return(new_person.full_name + ' with I.D number '
                        + unique_id + ' has been allocated the '
-                       + person_living.room_type + ' '
-                       + person_living.room_name)
+                       + 'living space' + ' '
+                       + person_living.room_name + ' and ' + 'an office '
+                       + 'called ' + person_office.room_name)
             elif person_office is None and person_living is None:
                 cls.unallocated_persons[unique_id] = [
                     new_person.full_name, 'Living Space']
@@ -107,7 +108,7 @@ class Dojo(object):
                 new_person.assigned_room[
                     'my_office'] = person_office
                 cls.unallocated_persons[unique_id] = [
-                    new_person.full_name, 'Living Space']
+                    new_person.full_name, 'living space']
                 return(new_person.full_name + ' with I.D number '
                        + unique_id + ' has been allocated the '
                        + person_office.room_type + ' '
@@ -197,8 +198,8 @@ class Dojo(object):
             for room in combine_rooms:
                 if room.room_name == room_name:
                     if not any(room.room_members):
-                        return('There are no occupants in ' +
-                               room.room_name + ' at the moment.')
+                        return ('There are no occupants in ' +
+                                room.room_name + ' at the moment.')
                     else:
                         output = ''
                         for key in sorted(room.room_members.values(),
@@ -208,7 +209,7 @@ class Dojo(object):
                                 + key.person_type + '\n'
                         return (output)
         else:
-            return('No room named', room_name, 'at the moment.')
+            return 'No room named ' + room_name + ' at the moment.'
 
     @classmethod
     def print_allocations(cls, filename=''):
@@ -221,27 +222,32 @@ class Dojo(object):
                 path = 'data/' + filename + '.txt'
             print('logging all allocated persons to ' + path + '...')
             my_file = open(path, 'w')
+            output = ""
             for room in combine_rooms:
                 if len(room.room_members) > 0:
                     output = room.room_name.upper() + '\n'
                     output = output + ('-' * 30) + '\n'
                     output = output + (', '.join(
-                                          [obj.full_name for obj in
-                                           room.room_members.values()]) + '\n')
+                                      [obj.full_name for obj in
+                                       room.room_members.values()]) + '\n')
                     my_file.write(output)
-                    my_file.close()
+            my_file.close()
+            if output:
+                return('Logging of allocated persons complete.')
             else:
                 return('There are no occupants in any room.')
+
         else:
+            output = ""
             for room in combine_rooms:
                 if len(room.room_members) > 0:
-                    output = room.room_name.upper() + '\n'
-                    output = output + ('-' * 30) + '\n'
-                    output = output + \
-                        (', '.join(
-                            [obj.full_name for obj in
-                                room.room_members.values()]) + '\n')
-                    return(output)
+                    output += room.room_name.upper() + '\n'
+                    output += ('-' * 30) + '\n'
+                    output += (', '.join(
+                                [obj.full_name for obj in
+                                 room.room_members.values()]) + '\n')
+            if output:
+                return(output)
             else:
                 return('There are no occupants in any room.')
 
@@ -256,13 +262,14 @@ class Dojo(object):
                 head = 'UNALLOCATED LIST\n'
                 head = head + ('-' * 30) + '\n'
             if len(cls.unallocated_persons) > 0:
-                print('logging all allocated persons to ' + path + '...')
+                print('logging all unallocated persons to ' + path + '...')
                 my_file = open(path, 'w')
                 my_file.write(head)
                 for value in sorted(cls.unallocated_persons.values()):
                     my_file.write(('{v1}: {v2}\n'.format(
                         v1=value[0], v2=value[1])))
                 my_file.close()
+                return("Logging of unallocated persons complete.")
             else:
                 return('There are no unallocated persons.')
         else:
@@ -286,10 +293,11 @@ class Dojo(object):
             if len(office_obj[0].room_members) == 6:
                 return('Room is already filled to capacity.')
             elif person_id in office_obj[0].room_members:
-                return (person_id, 'is already a member of room', room_name)
+                return (person_id + 'is already a member of room'
+                        + room_name)
             else:
-                cls.reallocate_person_to_office(
-                    person_id, room_name, office_obj[0])
+                return(cls.reallocate_person_to_office(
+                    person_id, room_name, office_obj[0]))
         elif not office_obj:
             living_obj = [room for room in
                           cls.all_living_space if room.room_name == room_name]
@@ -297,10 +305,13 @@ class Dojo(object):
                 if len(living_obj[0].room_members) == 4:
                     return('Room is already filled to capacity.')
                 elif person_id in living_obj[0].room_members:
-                    return(person_id, 'is already a member of room', room_name)
+                    return(person_id + 'is already a member of room'
+                           + room_name)
                 else:
-                    cls.reallocate_person_to_ls(
-                        person_id, room_name, living_obj[0])
+                    return(cls.reallocate_person_to_ls(
+                        person_id, room_name, living_obj[0]))
+            else:
+                return(room_name, 'does not exist.')
         else:
             return(room_name, 'does not exist.')
 
@@ -315,9 +326,9 @@ class Dojo(object):
                     person_id] = cls.all_persons_in_dojo[person_id]
                 cls.all_persons_in_dojo[person_id].assigned_room[
                     'my_office'] = room_obj
-                return(person_id, 'has been successfully reallocated.')
+                return(person_id + ' has been successfully reallocated.')
             else:
-                return(person_id, 'is yet to be allocated an office.')
+                return(person_id + ' is yet to be allocated an office.')
         else:
             return('Invalid identification number')
 
@@ -332,9 +343,9 @@ class Dojo(object):
                     person_id] = cls.all_persons_in_dojo[person_id]
                 cls.all_persons_in_dojo[person_id].assigned_room[
                     'my_living'] = room_obj
-                return(person_id, 'has been successfully reallocated.')
+                print(person_id + ' has been successfully reallocated.')
             else:
-                return(person_id, 'is yet to be allocated a living space.')
+                print(person_id + ' is yet to be allocated a living space.')
         else:
             return('Invalid identification number')
 
@@ -361,10 +372,13 @@ class Dojo(object):
             return("No file named ", filename, " in the data folder.")
 
     @classmethod
-    def save_state(cls, database_name='db'):
+    def save_state(cls, database_name):
         """Persist all current data in the app to a database."""
         print('Saving current state to database....')
-        path = 'database/' + database_name + '.sqlite3'
+        if database_name:
+            path = 'database/' + database_name + '.sqlite3'
+        else:
+            path = 'database/db.sqlite3'
         if os.path.isfile(path):
             return("Permission Denied. You specified an already existing"
                    "database. Kindly choose another.")
@@ -398,7 +412,12 @@ class Dojo(object):
         """Query and load all app data from database back to the app."""
         print("Loading past state from database....")
         path = 'database/' + database_name + '.sqlite3'
-        database = DbConnector(path)
+
+        if not os.path.isfile(path):
+            return("You have not specified an existing database."
+                   " Kindly specify one.")
+        else:
+            database = DbConnector(path)
 
         database_session = database.Session
         for instance in database_session.query(OfficeData):
@@ -413,3 +432,5 @@ class Dojo(object):
         for instance in database_session.query(UnallocatedData):
             cls.unallocated_persons = instance.person_objs
         database_session.close()
+
+        return("The past state has been successfully loaded.")
