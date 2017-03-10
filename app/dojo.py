@@ -45,48 +45,37 @@ class Dojo(object):
         """Remove a person from dojo."""
         if person_id in cls.all_persons_in_dojo and\
                 person_id in cls.unallocated_persons:
-            if len(cls.all_persons_in_dojo[person_id].assigned_room) == 2:
-                del cls.all_persons_in_dojo[
-                    person_id].assigned_room['my_living'].room_members[
-                    person_id]
-                del cls.all_persons_in_dojo[
-                    person_id].assigned_room['my_office'].room_members[
-                    person_id]
-            elif len(cls.all_persons_in_dojo[person_id].assigned_room) == 1:
-                if 'my_office' in cls.all_persons_in_dojo[
-                        person_id].assigned_room:
-                    del cls.all_persons_in_dojo[
-                        person_id].assigned_room['my_office'].room_members[
-                        person_id]
-                else:
-                    del cls.all_persons_in_dojo[
-                        person_id].assigned_room['my_living'].room_members[
-                        person_id]
+            cls.remove_from_room(person_id)
             del cls.all_persons_in_dojo[person_id]
             del cls.unallocated_persons[person_id]
             return(person_id + " has been successfully removed.")
         elif person_id in cls.all_persons_in_dojo:
-            if len(cls.all_persons_in_dojo[person_id].assigned_room) == 2:
-                del cls.all_persons_in_dojo[
-                    person_id].assigned_room['my_living'].room_members[
-                    person_id]
-                del cls.all_persons_in_dojo[
-                    person_id].assigned_room['my_office'].room_members[
-                    person_id]
-            elif len(cls.all_persons_in_dojo[person_id].assigned_room) == 1:
-                if 'my_office' in cls.all_persons_in_dojo[
-                        person_id].assigned_room:
-                    del cls.all_persons_in_dojo[
-                        person_id].assigned_room['my_office'].room_members[
-                        person_id]
-                else:
-                    del cls.all_persons_in_dojo[
-                        person_id].assigned_room['my_living'].room_members[
-                        person_id]
+            cls.remove_from_room(person_id)
             del cls.all_persons_in_dojo[person_id]
             return(person_id + " has been successfully removed.")
         else:
             return('Invalid identification number.')
+
+    @classmethod
+    def remove_from_room(cls, person_id):
+        """Remove a person from is all assigned room."""
+        if len(cls.all_persons_in_dojo[person_id].assigned_room) == 2:
+            del cls.all_persons_in_dojo[
+                person_id].assigned_room['my_living'].room_members[
+                person_id]
+            del cls.all_persons_in_dojo[
+                person_id].assigned_room['my_office'].room_members[
+                person_id]
+        elif len(cls.all_persons_in_dojo[person_id].assigned_room) == 1:
+            if 'my_office' in cls.all_persons_in_dojo[
+                    person_id].assigned_room:
+                del cls.all_persons_in_dojo[
+                    person_id].assigned_room['my_office'].room_members[
+                    person_id]
+            else:
+                del cls.all_persons_in_dojo[
+                    person_id].assigned_room['my_living'].room_members[
+                    person_id]
 
     @classmethod
     def print_all_persons(cls):
