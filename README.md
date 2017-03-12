@@ -27,6 +27,7 @@ Room_space_allocator is a python3 program that allocates room based on different
 * Activate the new virtual environment using `workon <env_name>`
 * Install nose using `pip install Nose`
 * Install Docopt using `pip install docopt==0.6.2`
+* Install Sqlalchemy using `pip install sqlalchemy`
 
 ## How to Use
 ### To run nose test
