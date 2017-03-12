@@ -1,6 +1,6 @@
 # Room_space_allocator
 [![Build Status](https://travis-ci.org/andela-iikikin/Room_space_allocator.svg?branch=wip)](https://travis-ci.org/andela-iikikin/Room_space_allocator)
-[![Coverage Status](https://coveralls.io/repos/github/andela-iikikin/Room_space_allocator/badge.svg)](https://coveralls.io/github/andela-iikikin/Room_space_allocator)
+[![Coverage Status](https://coveralls.io/repos/github/andela-iikikin/Room_space_allocator/badge.svg?branch=wip)](https://coveralls.io/github/andela-iikikin/Room_space_allocator?branch=wip)
 
 Room_space_allocator is a python3 program that allocates room based on different designations.
 
