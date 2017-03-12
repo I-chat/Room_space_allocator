@@ -42,7 +42,7 @@ class TestDojo(unittest.TestCase):
         double_red_offices = Dojo.create_room('office', ['red', 'red'])
         fourth_room_count = len(Dojo.all_office)
         self.assertEqual(double_red_offices,
-                         'An office called red has been created.'
+                         'An office called RED has been created.'
                          '\nRoom already exist.\n')
         self.assertEqual(fourth_room_count, 2)
 
@@ -115,7 +115,7 @@ class TestDojo(unittest.TestCase):
         double_red_ls = Dojo.create_room('living', ['red', 'red'])
         fourth_room_count = len(Dojo.all_living_space)
         self.assertEqual(double_red_ls,
-                         'A living space called red has been created.'
+                         'A living space called RED has been created.'
                          '\nRoom already exist.\n')
         self.assertEqual(fourth_room_count, 2)
 
@@ -168,6 +168,18 @@ class TestDojo(unittest.TestCase):
         Dojo.add_person_input_check('ladi', 'adeniran', 'fellow', 'y')
         third_person_count = len(living_one.room_members)
         self.assertEqual(third_person_count, 2)
+
+    def test_nonavialable_office(self):
+        """Test when no office is available."""
+        initial_dojo_count = len(Dojo.all_persons_in_dojo)
+        self.assertEqual(initial_dojo_count, 0)
+        initial_unallocated_count = len(Dojo.unallocated_persons)
+        self.assertEqual(initial_unallocated_count, 0)
+        Dojo.add_person_input_check('bolaji', 'olajide', 'fellow')
+        second_dojo_count = len(Dojo.all_persons_in_dojo)
+        second_unallocated_count = len(Dojo.unallocated_persons)
+        self.assertEqual(second_dojo_count, 1)
+        self.assertEqual(second_unallocated_count, 1)
 
     def test_test_add_more_than_four_person_in_living(self):
         """Test that not more than 4 persons can be assigned a living space."""
@@ -332,7 +344,7 @@ class TestDojo(unittest.TestCase):
         Dojo.create_room('living', ['red', 'green'])
         Dojo.add_person_input_check('ladi', 'adeniran', 'fellow', 'y')
         Dojo.save_state('test_db')
-        database = DbConnector('database/db.sqlite3')
+        database = DbConnector('database/test_db.sqlite3')
         database_session = database.Session
         for instance in database_session.query(LivingSpaceData):
             saved_data = instance.living_space_objs
@@ -349,7 +361,7 @@ class TestDojo(unittest.TestCase):
             dojo_fullname = Dojo.all_persons_in_dojo[dojo_person_id].full_name
             self.assertEqual(database_fullname, dojo_fullname)
         database_session.close()
-        os.remove("database/db.sqlite3")
+        os.remove("database/test_db.sqlite3")
 
     def test_load_state(self):
         """Test the Loading of all data from the database to the app."""
