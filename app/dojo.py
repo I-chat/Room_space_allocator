@@ -123,70 +123,70 @@ class Dojo(object):
             return(fellow_id)
 
     @classmethod
+    def allocate_office(cls, person_id, office_obj, person_obj):
+        """Allocate an office."""
+        cls.all_persons_in_dojo[person_id] = person_obj
+        office_obj.room_members[
+            person_id] = person_obj
+        person_obj.assigned_room[
+            'my_office'] = office_obj
+        return(person_obj.full_name + ' with I.D number '
+               + person_id + ' has been allocated the '
+               + office_obj.room_type + ' '
+               + office_obj.room_name)
+
+    @classmethod
+    def allocate_living(cls, person_id, living_obj, person_obj):
+        """Allocate a living space."""
+        living_obj.room_members[person_id] = person_obj
+        person_obj.assigned_room[
+            'my_living'] = living_obj
+        return(person_obj.full_name + ' with I.D number '
+               + person_id + ' has been allocated the '
+               + 'living space' + ' '
+               + living_obj.room_name)
+
+    @classmethod
     def add_fellow(cls, first_name, last_name,
                    person_type, wants_accomodation='n'):
         """Instantiate Fellow objects and add them to rooms."""
         new_person = Fellow(first_name, last_name)
         unique_id = cls.id_generator(person_type)
+        person_living = cls.get_available_room('living')
+        person_office = cls.get_available_room('office')
         if wants_accomodation == 'y':
-            person_living = cls.get_available_room('living')
-            person_office = cls.get_available_room('office')
             if person_living and person_office:
-                cls.all_persons_in_dojo[unique_id] = new_person
-                person_living.room_members[unique_id] = new_person
-                person_office.room_members[unique_id] = new_person
-                new_person.assigned_room[
-                    'my_living'] = person_living
-                new_person.assigned_room[
-                    'my_office'] = person_office
-                return(new_person.full_name + ' with I.D number '
-                       + unique_id + ' has been allocated the '
-                       + 'living space' + ' '
-                       + person_living.room_name + ' and ' + 'an office '
-                       + 'called ' + person_office.room_name + '\n')
+                result = cls.allocate_office(unique_id, person_office,
+                                             new_person)
+                cls.allocate_living(unique_id, person_living, new_person)
+                return(result + ' and a ' + 'living space '
+                       + 'called ' + person_living.room_name + '\n')
             elif person_office is None and person_living is None:
                 cls.all_persons_in_dojo[unique_id] = new_person
                 cls.unallocated_persons[unique_id] = [
                     new_person.full_name, 'living space', 'office']
                 return('No office and living room available.\n')
             elif person_office:
-                cls.all_persons_in_dojo[unique_id] = new_person
-                person_office.room_members[
-                    unique_id] = new_person
-                new_person.assigned_room[
-                    'my_office'] = person_office
+                result = cls.allocate_office(unique_id, person_office,
+                                             new_person)
                 cls.unallocated_persons[unique_id] = [
                     new_person.full_name, 'living space']
-                return(new_person.full_name + ' with I.D number '
-                       + unique_id + ' has been allocated the '
-                       + person_office.room_type + ' '
-                       + person_office.room_name + '.Only an Office was '
+                return(result + '.Only an Office was '
                        'allocated. No available Living Space.\n')
             else:
                 cls.all_persons_in_dojo[unique_id] = new_person
-                person_living.room_members[
-                    unique_id] = new_person
-                new_person.assigned_room[
-                    'my_living'] = person_living
+                result = cls.allocate_living(unique_id,
+                                             person_living, new_person)
                 cls.unallocated_persons[unique_id] = [
                     new_person.full_name, 'office']
-                return(new_person.full_name + ' with I.D number '
-                       + unique_id + ' has been allocated the '
-                       + 'living space' + ' '
-                       + person_living.room_name + '.Only a Living Space '
+                return(result + '.Only a Living Space '
                        'was allocated. No available Office.\n')
         else:
             person_office = cls.get_available_room('office')
             if person_office:
-                cls.all_persons_in_dojo[unique_id] = new_person
-                person_office.room_members[
-                    unique_id] = new_person
-                new_person.assigned_room[
-                    'my_office'] = person_office
-                return(new_person.full_name + ' with I.D number '
-                       + unique_id + ' has been allocated the '
-                       + person_office.room_type + ' '
-                       + person_office.room_name + '\n')
+                result = cls.allocate_office(unique_id, person_office,
+                                             new_person)
+                return(result + '\n')
             else:
                 cls.all_persons_in_dojo[unique_id] = new_person
                 cls.unallocated_persons[
@@ -203,21 +203,13 @@ class Dojo(object):
         if wants_accomodation == 'y' and not person_office:
             return('Sorry. Only fellows can have a living space.\n')
         elif wants_accomodation == 'y' and person_office:
-            cls.all_persons_in_dojo[unique_id] = new_person
-            person_office.room_members[unique_id] = new_person
+            result = cls.allocate_office(unique_id, person_office, new_person)
             output = '\nSorry. Only fellows can have a living space.'
-            return(new_person.full_name + ' with I.D number '
-                   + unique_id + ' has been allocated the '
-                   + person_office.room_type + ' '
-                   + person_office.room_name + output + '\n')
+            return(result + output + '\n')
         elif person_office:
-            cls.all_persons_in_dojo[unique_id] = new_person
-            person_office.room_members[unique_id] = new_person
+            result = cls.allocate_office(unique_id, person_office, new_person)
             new_person.assigned_room['my_office'] = person_office
-            return(new_person.full_name + ' with I.D number '
-                   + unique_id + ' has been allocated the '
-                   + person_office.room_type + ' ' + person_office.room_name
-                   + '\n')
+            return(result + '\n')
         else:
             cls.unallocated_persons[
                 unique_id] = [new_person.full_name, 'office']
@@ -329,7 +321,6 @@ class Dojo(object):
             head = head + ('-' * 30) + '\n'
             if len(cls.unallocated_persons) > 0:
                 output = ''
-                print(cls.unallocated_persons)
                 for key, value in sorted(cls.unallocated_persons.items()):
                     v3_value = ', ' + value[2] if len(value) == 3 else ""
                     output = output + ('{v0}: {v1}: {v2}{v3}\n'.format(
@@ -362,7 +353,6 @@ class Dojo(object):
                     return(person_id + 'is already a member of room'
                            + room_name)
                 else:
-                    print(room_name)
                     return(cls.reallocate_person_to_ls(
                         person_id, room_name, living_obj[0]))
             else:
