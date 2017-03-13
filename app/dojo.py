@@ -255,44 +255,57 @@ class Dojo(object):
             return 'No room named ' + room_name + ' at the moment.'
 
     @classmethod
+    def generate_allocation_list(cls, room_list):
+        """Generate a list of all allocated persons."""
+        output = ""
+        for room in room_list:
+            if len(room.room_members) > 0:
+                output += room.room_name.upper() + '\n'
+                output += ('-' * 30) + '\n'
+                output += (', '.join(
+                            [obj.full_name for obj in
+                             room.room_members.values()]) + '\n')
+        if output:
+            return(output)
+        else:
+            return('There are no occupants in any room.')
+
+    @classmethod
     def print_allocations(cls, filename=''):
         """Get a list of rooms and their respective occupants."""
         combine_rooms = cls.all_living_space + cls.all_office
+        unempty_room = [room for room in
+                        combine_rooms if len(room.room_members) > 0]
         if filename:
             if '.txt' in filename:
                 path = 'data/' + filename
             else:
                 path = 'data/' + filename + '.txt'
             print('logging all allocated persons to ' + path + '...')
+            result = cls.generate_allocation_list(unempty_room)
             my_file = open(path, 'w')
-            output = ""
-            for room in combine_rooms:
-                if len(room.room_members) > 0:
-                    output = room.room_name.upper() + '\n'
-                    output = output + ('-' * 30) + '\n'
-                    output = output + (', '.join(
-                                      [obj.full_name for obj in
-                                       room.room_members.values()]) + '\n')
-                    my_file.write(output)
-            my_file.close()
-            if output:
+            if result.endswith("room."):
+                return(result)
+            else:
+                my_file.write(result)
                 return('Logging of allocated persons complete.')
-            else:
-                return('There are no occupants in any room.')
-
         else:
-            output = ""
-            for room in combine_rooms:
-                if len(room.room_members) > 0:
-                    output += room.room_name.upper() + '\n'
-                    output += ('-' * 30) + '\n'
-                    output += (', '.join(
-                                [obj.full_name for obj in
-                                 room.room_members.values()]) + '\n')
-            if output:
-                return(output)
-            else:
-                return('There are no occupants in any room.')
+            return(cls.generate_allocation_list(unempty_room))
+
+    @classmethod
+    def generate_unallocated_list(cls):
+        """Generate a list of all unallocated persons."""
+        head = 'UNALLOCATED LIST\n'
+        head = head + ('-' * 30) + '\n'
+        if len(cls.unallocated_persons) > 0:
+            output = ''
+            for key, value in sorted(cls.unallocated_persons.items()):
+                v3_value = ', ' + value[2] if len(value) == 3 else ""
+                output = output + ('{v0}: {v1}: {v2}{v3}\n'.format(
+                    v0=key, v1=value[0], v2=value[1], v3=v3_value))
+            return(head + output)
+        else:
+            return('There are no unallocated persons.')
 
     @classmethod
     def print_unallocated(cls, filename=''):
@@ -302,32 +315,18 @@ class Dojo(object):
                 path = 'data/' + filename
             else:
                 path = 'data/' + filename + '.txt'
-                head = 'UNALLOCATED LIST\n'
-                head = head + ('-' * 30) + '\n'
-            if len(cls.unallocated_persons) > 0:
-                print('logging all unallocated persons to ' + path + '...')
+
+            result = cls.generate_unallocated_list()
+
+            if result.endswith("persons."):
+                return('There are no unallocated persons.')
+            else:
                 my_file = open(path, 'w')
-                my_file.write(head)
-                for key, value in sorted(cls.unallocated_persons.items()):
-                    v3_value = ', ' + value[2] if len(value) == 3 else ""
-                    my_file.write(('{v0}: {v1}: {v2}{v3}\n'.format(
-                        v0=key, v1=value[0], v2=value[1], v3=v3_value)))
-                my_file.close()
+                my_file.write(result)
                 return("Logging of unallocated persons complete.")
-            else:
-                return('There are no unallocated persons.')
         else:
-            head = 'UNALLOCATED LIST\n'
-            head = head + ('-' * 30) + '\n'
-            if len(cls.unallocated_persons) > 0:
-                output = ''
-                for key, value in sorted(cls.unallocated_persons.items()):
-                    v3_value = ', ' + value[2] if len(value) == 3 else ""
-                    output = output + ('{v0}: {v1}: {v2}{v3}\n'.format(
-                        v0=key, v1=value[0], v2=value[1], v3=v3_value))
-                return(head + output)
-            else:
-                return('There are no unallocated persons.')
+            result = cls.generate_unallocated_list()
+            return(result)
 
     @classmethod
     def reallocate_person(cls, person_id, room_name):
