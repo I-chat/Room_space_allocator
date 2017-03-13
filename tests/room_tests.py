@@ -1,8 +1,8 @@
 """This module is imported to the test script to test the functionalities."""
 
 
-import unittest
 import os
+import unittest
 
 from app.dojo import Dojo
 from database.database import (DbConnector, PersonData, LivingSpaceData)
