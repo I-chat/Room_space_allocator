@@ -8,8 +8,7 @@ class Person(object):
         """Initialize Person object with set variable names."""
         self.first_name = first_name
         self.last_name = last_name
-        self.full_name = (first_name + ' ' + last_name)
-        self.assigned_room = {}
+        self.assigned_rooms = {'my_office': '', 'my_livingspace': ''}
 
 
 class Staff(Person):

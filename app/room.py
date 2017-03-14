@@ -25,4 +25,4 @@ class LivingSpace(Room):
     def __init__(self, room_name):
         """Initialize LivingSpace object with set variable name."""
         super(LivingSpace, self).__init__(room_name)
-        self.room_type = 'living'
+        self.room_type = 'livingspace'

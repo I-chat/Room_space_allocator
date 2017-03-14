@@ -64,20 +64,20 @@ class MyInteractive (cmd.Cmd):
     intro = 'Welcome to Room Allocator!' \
         + ' (type help for a list of commands.)'
     prompt = '(Room Allocator) '
-    file = None
 
     @docopt_cmd
     def do_create_room(self, arg):
         """Usage: create_room <room_type> <room_name>..."""
         room_name = arg["<room_name>"]
         room_type = arg["<room_type>"].lower()
-        if room_type == 'office' or room_type == 'living':
+        if room_type in ['office', 'livingspace']:
             if all([x.isalnum() for x in room_name]):
                 print(Dojo.create_room(room_type, room_name))
             else:
                 print('Room name should only contain alphanumeric characters.')
         else:
-            print('room_type can only accept \'office\' or \'living\' input.')
+            print('room_type can only accept \'office\' or \'livingspace\''
+                  'input.')
 
     @docopt_cmd
     def do_add_person(self, arg):
@@ -86,21 +86,9 @@ class MyInteractive (cmd.Cmd):
         first_name = arg["<person_first_name>"].lower()
         last_name = arg["<person_last_name>"].lower()
         person_type = arg["<designation>"].lower()
-        wants_accomodation = arg["<--wants_accomodation>"]
-        if wants_accomodation is None:
-            wants_accomodation = 'n'
-        if (wants_accomodation == 'y' or wants_accomodation == 'n'):
-            if person_type == 'fellow' or person_type == 'staff':
-                if first_name.isalpha() and last_name.isalpha():
-                    print(Dojo.add_person_input_check(first_name, last_name,
-                                                      person_type,
-                                                      wants_accomodation))
-                else:
-                    print('First name and last name can only be alphabets.')
-            else:
-                print('A person can only be a fellow or a staff.')
-        else:
-            print("wants_accomodation can only be 'Y' or 'N'.")
+        wants_accomodation = arg["<--wants_accomodation>"] or 'n'
+        print(Dojo.add_person_input_check(first_name, last_name,
+                                          person_type, wants_accomodation))
 
     @docopt_cmd
     def do_print_room(self, arg):

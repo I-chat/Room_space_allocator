@@ -20,17 +20,30 @@ Room_space_allocator is a python3 program that allocates room based on different
     - **`load_state <sqlite_database>`** Loads data from a database into the application.
 
 ## Dependencies
-* Docopt
-* Nose
-* Virtualenvwrapper for Unix based OS and Virtualenvwrapper-win for Windows
+* [Python 3](https://www.python.org/download/releases/3.0/) - Python is a programming language that lets you work quickly
+and integrate systems more effectively.
+* [Docopt](http://docopt.org/) - A command line description framework.
+* [Nose](https://pypi.python.org/pypi/nose/1.3.7) - Nose extends the test loading and running features of unittest, making
+it easier to write, find and run tests.
+* [Virtualenvwrapper](http://virtualenvwrapper.readthedocs.io/en/latest/) - A set of extensions to Ian Bicking’s [virtualenv](https://pypi.python.org/pypi/virtualenv) tool. The extensions include wrappers for creating and deleting virtual environments for Unix based OS and [Virtualenvwrapper-win](https://pypi.python.org/pypi/virtualenvwrapper-win) for Windows
 
 ## How to Install
+### On a Unix based OS
+* Install python 3 using `sudo apt-get install python3-dev`
 * Install Virtualenvwrapper using `pip install Virtualenvwrapper`
-* Make a new virtual environment using `mkvirtualenv --python=python3 <env_name>``
+* Make a new virtual environment using `mkvirtualenv --python=python3 <env_name>`
 * Activate the new virtual environment using `workon <env_name>`
-* Install nose using `pip install Nose`
-* Install Docopt using `pip install docopt==0.6.2`
-* Install Sqlalchemy using `pip install sqlalchemy`
+* Download and extract the project.
+* cd into Room_space_allocator folder and run `pip install -r requirements.txt` from the terminal.
+
+### On Windows OS
+* Download and install the [python 3](https://www.python.org/downloads/windows/) package for Windows.
+* Install Virtualenvwrapper-win using `pip3 install Virtualenvwrapper-win`
+* On the command line run `where python3` and copy the path to the python3 interpreter.
+* Make a new virtual environment using `mkvirtualenv --python=<path to the python3 interpreter> <env_name>`
+* Activate the new virtual environment using `workon <env_name>`
+* Download and extract the project.
+* cd into Room_space_allocator folder and run `pip install -r requirements.txt` from the command prompt.
 
 ## How to Use
 ### To run nose test
@@ -38,4 +51,4 @@ Room_space_allocator is a python3 program that allocates room based on different
 * run `nosetests`
 
 ### To use the functionalities
-* cd into the app directory in the project folder and run `python main.py`
+* cd into the project root directory and run `python main.py`
